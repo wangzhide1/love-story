@@ -2439,6 +2439,9 @@ input, textarea, select {
 <!-- ═══════════════ Back to Top ═══════════════ -->
 <button class="back-to-top" id="backToTop" aria-label="回到顶部" title="回到顶部">↑</button>
 
+<!-- ═══════════════ Edit Mode Toggle ═══════════════ -->
+<button class="edit-mode-toggle" id="editModeToggle" aria-label="编辑模式" title="自定义编辑">✏️</button>
+
 <!-- ═══════════════ SCRIPTS ═══════════════ -->
 <script>
 /* ═══════════════════════════════════════════════════════════════
@@ -3360,11 +3363,24 @@ window.initMusic = function() {
     var cc = JSON.parse(localStorage.getItem('love_custom_config') || '{}');
     songId = cc.neteaseSongId || (LOVE_CONFIG && LOVE_CONFIG.neteaseSongId) || songId;
   } catch(e) {}
-  iframe.src = 'https://music.163.com/outchain/player?type=2&id=' + songId + '&auto=0&height=90';
-  iframe.onload = function() { showGlobalToast('🎵 音乐加载成功 ♫'); };
-  iframe.onerror = function() {
-    box.innerHTML = '<div style="padding:16px;color:#a090a0;font-size:0.82rem;text-align:center;line-height:1.8;">♫ 音乐加载失败<br><span style="font-size:0.72rem;color:#c0b0c0;">请打开编辑面板 → 音乐标签页，检查或更换歌曲ID</span></div>';
+  iframe.src = 'https://music.163.com/outchain/player?type=2&id=' + songId + '&auto=1&height=90';
+  var loaded = false;
+  iframe.onload = function() {
+    loaded = true;
+    showGlobalToast('🎵 音乐加载成功 ♫');
   };
+  iframe.onerror = function() {
+    showGlobalToast('⚠️ 音乐加载失败，请检查歌曲 ID 或尝试其他歌曲');
+    box.innerHTML = '<div style="padding:12px 16px;text-align:center;color:var(--text-muted);font-size:0.82rem;line-height:1.8;"><div style="font-size:1.2rem;margin-bottom:6px;">🎵</div>暂无法播放此歌曲<div style="font-size:0.75rem;margin-top:4px;color:var(--text-light);">可能是版权限制，请在编辑面板中更换歌曲 ID</div></div>';
+  };
+  setTimeout(function() {
+    if (!loaded) {
+      showGlobalToast('⚠️ 音乐加载超时，可能是版权限制');
+      if (!box.querySelector('div')) {
+        box.innerHTML = '<div style="padding:12px 16px;text-align:center;color:var(--text-muted);font-size:0.82rem;line-height:1.8;"><div style="font-size:1.2rem;margin-bottom:6px;">🎵</div>暂无法播放此歌曲<div style="font-size:0.75rem;margin-top:4px;color:var(--text-light);">可能是版权限制，请在编辑面板中更换歌曲 ID</div></div>';
+      }
+    }
+  }, 8000);
   box.appendChild(iframe);
   box.classList.add('show');
   document.getElementById('musicToggleBtn').textContent = '🎵';
