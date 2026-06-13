@@ -3,6 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="王志德 & 杨秋燕的专属恋爱纪念空间 · 记录我们相识以来的每一个甜蜜瞬间">
+<meta name="theme-color" content="#fef9f4">
+<meta property="og:title" content="王志德 & 杨秋燕 · 我们的纪念日">
+<meta property="og:description" content="专属恋爱空间 · 相识于2024年7月 · 记录我们的甜蜜故事">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💗</text></svg>">
 <title>王志德 & 杨秋燕 · 我们的纪念日</title>
 <!-- Google Fonts: 海外加载（国内被墙时 display=swap 确保文本立即可见，使用系统字体回退） -->
 <link href="https://fonts.googleapis.com/css2?family=ZCOOL+XiaoWei&family=Noto+Serif+SC:wght@300;400;500;600&display=swap" rel="stylesheet" crossorigin="anonymous">
@@ -355,6 +361,9 @@ body {
   max-width: 1100px;
   margin: 0 auto;
 }
+.section:last-child {
+  padding-bottom: 140px;
+}
 .section-header {
   text-align: center;
   margin-bottom: 56px;
@@ -393,11 +402,12 @@ body {
   justify-content: center;
   position: relative;
   z-index: 1;
-  padding: 24px;
+  padding: 88px 24px 24px;
 }
 .hero-content {
   text-align: center;
-  animation: fadeInUp 1s ease;
+  opacity: 0;
+  animation: fadeInUp 1s ease forwards;
 }
 @keyframes fadeInUp {
   from { opacity: 0; transform: translateY(40px); }
@@ -1208,11 +1218,11 @@ body {
   box-shadow: var(--shadow-md);
   transition: var(--transition-smooth);
   color: var(--pink-deep);
-  animation: musicPulse 2s ease-in-out infinite;
+  animation: musicPulse 6s ease-in-out infinite;
 }
 @keyframes musicPulse {
-  0%, 100% { box-shadow: 0 4px 16px rgba(200,160,180,0.3); }
-  50% { box-shadow: 0 4px 28px rgba(200,160,180,0.5); }
+  0%, 100% { box-shadow: 0 4px 16px rgba(200,160,180,0.25); }
+  50% { box-shadow: 0 4px 28px rgba(200,160,180,0.45); }
 }
 .music-toggle-btn:hover {
   transform: scale(1.08);
@@ -1262,15 +1272,57 @@ body {
   transition: var(--transition-smooth);
   white-space: nowrap;
   pointer-events: none;
+  animation: hintAutoShow 20s ease-in-out infinite;
+}
+@keyframes hintAutoShow {
+  0%, 90%, 100% { opacity: 0; transform: translateX(10px); }
+  92%, 98% { opacity: 1; transform: translateX(0); }
 }
 .music-container:hover .music-hint {
   opacity: 1;
   transform: translateX(0);
+  animation: none;
 }
 @media (max-width: 560px) {
   .music-container { bottom: 16px; right: 16px; }
   .music-player-box iframe { width: 260px; height: 86px; }
   .music-hint { bottom: 70px; right: 16px; }
+  .back-to-top { bottom: 76px; right: 16px; }
+}
+
+/* ═══════════════════════════════════
+   Back to Top Button
+   ═══════════════════════════════════ */
+.back-to-top {
+  position: fixed;
+  bottom: 88px; right: 28px;
+  z-index: 1400;
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.75);
+  backdrop-filter: blur(16px) saturate(160%);
+  -webkit-backdrop-filter: blur(16px) saturate(160%);
+  border: 0.5px solid var(--card-border);
+  cursor: pointer;
+  font-size: 1.1rem;
+  color: var(--pink-deep);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-sm);
+  opacity: 0;
+  transform: translateY(12px);
+  pointer-events: none;
+  transition: var(--transition-smooth);
+}
+.back-to-top.visible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+.back-to-top:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
 }
 
 /* ═══════════════════════════════════
@@ -1392,6 +1444,7 @@ input, textarea, select {
   .music-container { bottom: 12px !important; right: 12px !important; }
   .message-form { padding: 16px !important; }
   .diary-card { padding: 14px !important; }
+  .back-to-top { bottom: 68px !important; right: 12px !important; width: 38px !important; height: 38px !important; }
 }
 
 @media (max-width: 560px) {
@@ -1426,7 +1479,7 @@ input, textarea, select {
     </div>
     <button class="login-btn" id="loginBtn">♡ 进入我们的世界</button>
     <p class="login-error" id="loginError"></p>
-    <p class="login-hint">💡 提示：密码是对方的出生年月日</p>
+    <p class="login-hint">💡 输入 ta 的出生年月日即可进入（例如：20060108）</p>
   </div>
 </div>
 
@@ -1642,6 +1695,9 @@ input, textarea, select {
   <button class="music-toggle-btn" id="musicToggleBtn" aria-label="音乐控件">🎵</button>
 </div>
 
+<!-- ═══════════════ Back to Top ═══════════════ -->
+<button class="back-to-top" id="backToTop" aria-label="回到顶部" title="回到顶部">↑</button>
+
 <!-- ═══════════════ SCRIPTS ═══════════════ -->
 <script>
 /* ═══════════════════════════════════════════════════════════════
@@ -1660,12 +1716,12 @@ const LOVE_CONFIG = {
 
   // ── 时间轴（按时间顺序，可以增删改） ──
   timeline: [
-    { date: '2024.07',     title: '💕 初次相遇',  desc: '在这里写下你们第一次相遇的故事...' },
-    { date: '待填写',      title: '🌹 第一次约会', desc: '在这里写下你们第一次约会的故事...' },
-    { date: '待填写',      title: '💗 正式在一起', desc: '在这里写下确定关系那天的故事...' },
-    { date: '待填写',      title: '✈️ 第一次旅行', desc: '在这里写下你们旅行的故事...' },
-    { date: '待填写',      title: '🎉 第一个纪念日', desc: '在这里写下纪念日的故事...' },
-    { date: '待填写',      title: '🎄 特别的日子', desc: '在这里写下属于你们的特别回忆...' },
+    { date: '2024.07',     title: '💕 初次相遇',  desc: '那个夏天，我们第一次遇见了彼此。从此，世界变得不一样了。' },
+    { date: '2024.08',     title: '🌹 第一次约会', desc: '还记得那天你穿的裙子，还记得我紧张到说不出话。' },
+    { date: '2024.09',     title: '💗 正式在一起', desc: '从那天起，你就是我的全世界。' },
+    { date: '2024.12',     title: '✈️ 第一次旅行', desc: '一起看过的风景，每一帧都是最美的回忆。' },
+    { date: '2025.02',     title: '🎉 第一个情人节', desc: '玫瑰、巧克力，还有你甜过一切的笑容。' },
+    { date: '2025.07',     title: '🎂 一周年纪念', desc: '365天的甜蜜，只是我们故事的开始。' },
     { date: '2026.06.13',  title: '🌟 创建纪念网站', desc: '今天，我们为彼此建立了这个专属纪念网站。记录我们的过去，期待我们的未来。' },
   ],
 
@@ -1673,12 +1729,12 @@ const LOVE_CONFIG = {
   boy: {
     emoji: '🦊', role: '专属男友 / 首席陪伴官',
     tags: ['温柔体贴', '会做饭', '爱拍照', '巨蟹座'],
-    bio: '在这里写下关于他的介绍...'
+    bio: '在这里写下关于他的介绍，让世界知道你眼中的他有多特别...'
   },
   girl: {
     emoji: '🐰', role: '专属女友 / 终身可爱担当',
     tags: ['可爱撒娇', '爱画画', '小洁癖', '双鱼座'],
-    bio: '在这里写下关于她的介绍...'
+    bio: '在这里写下关于她的介绍，用文字画出她最美的样子...'
   },
 
   // ── 相册（修改标题和描述，点击图片可上传） ──
@@ -1701,16 +1757,16 @@ const LOVE_CONFIG = {
 
   // ── 日记 ──
   diary: [
-    { date: '待填写', weather: '☀️', title: '在这里写日记标题', excerpt: '在这里写日记内容...', mood: '💗💗💗' },
-    { date: '待填写', weather: '🌧️', title: '在这里写日记标题', excerpt: '在这里写日记内容...', mood: '💗💗💗' },
-    { date: '待填写', weather: '🌤️', title: '在这里写日记标题', excerpt: '在这里写日记内容...', mood: '💗💗💗' },
-    { date: '待填写', weather: '☀️', title: '在这里写日记标题', excerpt: '在这里写日记内容...', mood: '💗💗💗' },
+    { date: '2026.06.13', weather: '☀️', title: '我们有了专属网站', excerpt: '今天我们一起创建了这个专属恋爱纪念空间，以后我们的每一个甜蜜瞬间，都会在这里被好好珍藏。', mood: '💗💗💗💗💗' },
+    { date: '待填写', weather: '🌤️', title: '在这里写日记标题', excerpt: '点击这里修改日记内容，记录你们每天的甜蜜时刻...', mood: '💗💗💗' },
+    { date: '待填写', weather: '🌧️', title: '在这里写日记标题', excerpt: '点击这里修改日记内容，就算是下雨天，有你在也是晴天...', mood: '💗💗💗' },
+    { date: '待填写', weather: '☀️', title: '在这里写日记标题', excerpt: '点击这里修改日记内容，每一天都值得被记录...', mood: '💗💗💗💗' },
   ],
 
   // ── 留言板初始留言 ──
   messages: [
-    { author: '王志德', text: '在这里写下你想说的话...', hearts: '♥ ♡ ♥' },
-    { author: '杨秋燕', text: '在这里写下你想说的话...', hearts: '♡ ♥ ♡' },
+    { author: '王志德', text: '遇见你，是我这辈子最幸运的事。余生漫长，只想和你一起走。', hearts: '♥ ♡ ♥' },
+    { author: '杨秋燕', text: '谢谢你来到我的世界，让每一天都变得闪闪发光。', hearts: '♡ ♥ ♡' },
   ]
 };
 
@@ -2002,7 +2058,7 @@ function initMusic() {
         }, 100);
       }
     } else {
-      error.textContent = '密码不正确哦~ 请输入对方的出生年月日';
+      error.textContent = '密码不正确哦~ 请输入 ta 的出生年月日（如：20060108）';
       card.classList.add('shake');
       setTimeout(() => card.classList.remove('shake'), 500);
       input.value = '';
@@ -2167,6 +2223,17 @@ let scrollObserver;
     const isVisible = box.classList.toggle('show');
     btn.textContent = isVisible ? '🎵' : '🔇';
     showGlobalToast(isVisible ? '🎵 音乐已开启' : '🔇 音乐已关闭');
+  });
+})();
+
+/* ───────── Back to Top ───────── */
+(function() {
+  const btn = document.getElementById('backToTop');
+  btn.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+  window.addEventListener('scroll', () => {
+    btn.classList.toggle('visible', window.scrollY > 500);
   });
 })();
 
