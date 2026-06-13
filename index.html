@@ -381,7 +381,7 @@ body {
 }
 .section-title {
   font-family: 'ZCOOL XiaoWei', serif;
-  font-size: 2rem;
+  font-size: clamp(1.5rem, 3.5vw, 2rem);
   color: var(--text-primary);
   letter-spacing: 0.05em;
   margin-bottom: 10px;
@@ -749,7 +749,7 @@ body {
 .album-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
+  gap: clamp(10px, 2vw, 16px);
   max-width: 900px;
   margin: 0 auto;
 }
@@ -761,11 +761,19 @@ body {
   aspect-ratio: 1;
   background: linear-gradient(135deg, var(--pink-mist), var(--purple-mist));
   box-shadow: var(--shadow-sm);
-  transition: var(--transition-smooth);
+  transition: transform var(--transition-smooth), box-shadow var(--transition-smooth);
+  outline: none;
+}
+.album-item:focus-visible {
+  box-shadow: 0 0 0 3px var(--pink-rose), var(--shadow-lg);
+  transform: scale(1.03);
 }
 .album-item:hover {
   transform: scale(1.03);
   box-shadow: var(--shadow-lg);
+}
+.album-item:active {
+  transform: scale(0.98);
 }
 .album-placeholder {
   width: 100%; height: 100%;
@@ -776,6 +784,7 @@ body {
   color: rgba(255,255,255,0.7);
   font-size: 2.4rem;
   gap: 8px;
+  transition: opacity 0.4s ease;
 }
 .album-placeholder span {
   font-size: 0.8rem;
@@ -784,56 +793,132 @@ body {
 .album-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(0deg, rgba(180,140,160,0.5), transparent 50%);
+  background: linear-gradient(0deg, rgba(180,140,160,0.55), transparent 55%);
   opacity: 0;
-  transition: var(--transition-smooth);
+  transition: opacity var(--transition-smooth);
   display: flex;
   align-items: flex-end;
-  padding: 16px;
+  justify-content: space-between;
+  padding: 12px;
+  pointer-events: none;
 }
-.album-item:hover .album-overlay { opacity: 1; }
+.album-item:hover .album-overlay,
+.album-item:focus-visible .album-overlay { opacity: 1; }
 .album-overlay span {
   color: #fff;
   font-size: 0.85rem;
   letter-spacing: 0.04em;
-  text-shadow: 0 1px 4px rgba(0,0,0,0.2);
+  text-shadow: 0 1px 4px rgba(0,0,0,0.25);
+  font-weight: 500;
 }
 
-/* Album upload button */
-.album-upload-btn {
+/* Album action buttons (upload/delete) */
+.album-actions {
   position: absolute;
   top: 8px; right: 8px;
+  display: flex;
+  gap: 6px;
+  z-index: 6;
+  opacity: 0;
+  transform: scale(0.85);
+  transition: opacity var(--transition-fast), transform var(--transition-fast);
+}
+.album-item:hover .album-actions,
+.album-item:focus-visible .album-actions {
+  opacity: 1;
+  transform: scale(1);
+}
+.album-action-btn {
   width: 32px; height: 32px;
   border-radius: 50%;
   background: rgba(255,255,255,0.75);
   backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   border: 0.5px solid rgba(200,180,200,0.3);
   cursor: pointer;
   font-size: 0.85rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  opacity: 0;
-  transform: scale(0.8);
-  transition: var(--transition-fast);
-  z-index: 5;
+  transition: background var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast);
   line-height: 1;
+  padding: 0;
+  color: var(--text-primary);
 }
-.album-item:hover .album-upload-btn {
-  opacity: 1;
-  transform: scale(1);
-}
-.album-upload-btn:hover {
+.album-action-btn:hover {
   background: rgba(255,255,255,0.95);
   box-shadow: var(--shadow-sm);
+  transform: scale(1.1);
 }
+.album-action-btn:focus-visible {
+  outline: 2px solid var(--pink-rose);
+  outline-offset: 2px;
+}
+.album-action-btn.delete-btn {
+  color: #d47878;
+  display: none;
+}
+.album-item.has-image .album-action-btn.delete-btn {
+  display: flex;
+}
+
+/* Image count badge */
+.album-img-badge {
+  position: absolute;
+  top: 8px; left: 8px;
+  z-index: 4;
+  background: rgba(0,0,0,0.45);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  color: #fff;
+  font-size: 0.68rem;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  letter-spacing: 0.04em;
+  opacity: 0;
+  transform: translateY(-4px);
+  transition: opacity var(--transition-fast), transform var(--transition-fast);
+  pointer-events: none;
+}
+.album-item.has-image .album-img-badge {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Upload loading spinner */
+.album-loading-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  background: rgba(255,255,255,0.6);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+.album-loading-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+.album-spinner {
+  width: 32px; height: 32px;
+  border: 3px solid var(--pink-mist);
+  border-top-color: var(--pink-deep);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
 
 /* When image is loaded, hide placeholder */
 .album-item.has-image .album-placeholder {
   opacity: 0;
-  transition: opacity 0.4s ease;
 }
-.album-item.has-image:hover .album-placeholder {
+.album-item.has-image:hover .album-placeholder,
+.album-item.has-image:focus-visible .album-placeholder {
   opacity: 1;
 }
 .album-emoji {
@@ -842,43 +927,85 @@ body {
   margin-bottom: 4px;
 }
 
-/* Carousel upload button */
-.carousel-upload-btn {
+/* Carousel action buttons */
+.carousel-actions {
   position: absolute;
   top: 12px; right: 12px;
+  display: flex;
+  gap: 6px;
+  z-index: 5;
+  opacity: 0;
+  transform: scale(0.85);
+  transition: opacity var(--transition-fast), transform var(--transition-fast);
+}
+.carousel-slide:hover .carousel-actions,
+.carousel-slide:focus-visible .carousel-actions {
+  opacity: 1;
+  transform: scale(1);
+}
+.carousel-action-btn {
   width: 36px; height: 36px;
   border-radius: 50%;
   background: rgba(255,255,255,0.7);
   backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   border: 0.5px solid rgba(200,180,200,0.3);
   cursor: pointer;
   font-size: 0.95rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  opacity: 0;
-  transform: scale(0.8);
-  transition: var(--transition-fast);
-  z-index: 5;
+  transition: background var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast);
+  padding: 0;
+  color: var(--text-primary);
 }
-.carousel-slide:hover .carousel-upload-btn {
-  opacity: 1;
-  transform: scale(1);
-}
-.carousel-upload-btn:hover {
+.carousel-action-btn:hover {
   background: rgba(255,255,255,0.95);
   box-shadow: var(--shadow-sm);
+  transform: scale(1.1);
+}
+.carousel-action-btn:focus-visible {
+  outline: 2px solid var(--pink-rose);
+  outline-offset: 2px;
+}
+.carousel-action-btn.delete-btn {
+  color: #d47878;
+  display: none;
+}
+.carousel-slide.has-image .carousel-action-btn.delete-btn {
+  display: flex;
 }
 .carousel-emoji {
-  font-size: 4rem;
+  font-size: clamp(2.5rem, 6vw, 4rem);
   position: absolute;
   transition: opacity 0.4s ease;
 }
 .carousel-slide.has-image .carousel-emoji {
   opacity: 0;
 }
-.carousel-slide.has-image:hover .carousel-emoji {
+.carousel-slide.has-image:hover .carousel-emoji,
+.carousel-slide.has-image:focus-visible .carousel-emoji {
   opacity: 1;
+}
+
+/* Carousel loading overlay */
+.carousel-loading-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  background: rgba(255,255,255,0.6);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+.carousel-loading-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
 }
 
 /* Lightbox */
@@ -886,36 +1013,134 @@ body {
   position: fixed;
   inset: 0;
   z-index: 2000;
-  background: rgba(0,0,0,0.85);
-  backdrop-filter: blur(12px);
+  background: rgba(0,0,0,0.88);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   display: none;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
+  cursor: zoom-out;
+  animation: lightboxFadeIn 0.25s ease;
+}
+@keyframes lightboxFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 .lightbox.active { display: flex; }
-.lightbox-content {
-  max-width: 90vw;
-  max-height: 85vh;
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-glow);
-}
-.lightbox-close {
-  position: absolute;
-  top: 24px; right: 24px;
-  width: 44px; height: 44px;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.15);
-  border: none;
-  color: #fff;
-  font-size: 1.2rem;
-  cursor: pointer;
-  transition: var(--transition-fast);
+.lightbox-img-wrapper {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
+  max-width: 92vw;
+  max-height: 88vh;
+  touch-action: none;
+  cursor: grab;
+  transition: transform 0.1s ease-out;
 }
-.lightbox-close:hover { background: rgba(255,255,255,0.25); }
+.lightbox-img-wrapper.zoomed {
+  cursor: move;
+}
+.lightbox-content {
+  max-width: 92vw;
+  max-height: 88vh;
+  object-fit: contain;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-glow);
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-user-drag: none;
+  pointer-events: none;
+}
+.lightbox-close {
+  position: absolute;
+  top: 20px; right: 20px;
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.18);
+  color: #fff;
+  font-size: 1.25rem;
+  cursor: pointer;
+  transition: background var(--transition-fast);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  -webkit-tap-highlight-color: transparent;
+}
+.lightbox-close:hover,
+.lightbox-close:focus-visible {
+  background: rgba(255,255,255,0.25);
+}
+.lightbox-close:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+.lightbox-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 48px; height: 48px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.18);
+  color: #fff;
+  font-size: 1.4rem;
+  cursor: pointer;
+  transition: background var(--transition-fast);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  -webkit-tap-highlight-color: transparent;
+}
+.lightbox-nav:hover,
+.lightbox-nav:focus-visible {
+  background: rgba(255,255,255,0.25);
+}
+.lightbox-nav:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+.lightbox-nav.prev { left: clamp(8px, 3vw, 24px); }
+.lightbox-nav.next { right: clamp(8px, 3vw, 24px); }
+.lightbox-counter {
+  position: absolute;
+  bottom: 24px; left: 50%;
+  transform: translateX(-50%);
+  color: rgba(255,255,255,0.6);
+  font-size: 0.82rem;
+  letter-spacing: 0.06em;
+  z-index: 10;
+  pointer-events: none;
+}
+.lightbox-download {
+  position: absolute;
+  top: 20px; left: 20px;
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.18);
+  color: #fff;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: background var(--transition-fast), opacity var(--transition-fast);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  -webkit-tap-highlight-color: transparent;
+}
+.lightbox-download.visible { display: flex; }
+.lightbox-download:hover,
+.lightbox-download:focus-visible {
+  background: rgba(255,255,255,0.25);
+}
+.lightbox-download:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
 
 /* ═══════════════════════════════════
    Carousel Section
@@ -1251,7 +1476,7 @@ body {
   display: block;
   border: none;
   border-radius: 10px;
-  width: 300px;
+  width: clamp(220px, 28vw, 320px);
   height: 90px;
   background: transparent;
 }
@@ -1282,12 +1507,6 @@ body {
   opacity: 1;
   transform: translateX(0);
   animation: none;
-}
-@media (max-width: 560px) {
-  .music-container { bottom: 16px; right: 16px; }
-  .music-player-box iframe { width: 260px; height: 86px; }
-  .music-hint { bottom: 70px; right: 16px; }
-  .back-to-top { bottom: 76px; right: 16px; }
 }
 
 /* ═══════════════════════════════════
@@ -1372,18 +1591,93 @@ body {
 }
 
 /* ═══════════════════════════════════
-   Responsive Design
+   Accessibility & Skip Link
    ═══════════════════════════════════ */
-@media (max-width: 900px) {
-  .section { padding: 64px 20px; }
-  .section-title { font-size: 1.6rem; }
-  .hero-names { font-size: 2rem; }
-  .hero-and { font-size: 1.2rem; }
-  .countdown-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
-  .profile-grid { grid-template-columns: 1fr; max-width: 400px; }
-  .album-grid { grid-template-columns: repeat(2, 1fr); }
-  .diary-grid { grid-template-columns: 1fr; max-width: 500px; }
-  .message-grid { grid-template-columns: repeat(2, 1fr); }
+.skip-link {
+  position: fixed;
+  top: -100px; left: 50%;
+  transform: translateX(-50%);
+  z-index: 10000;
+  background: var(--pink-deep);
+  color: #fff;
+  padding: 10px 24px;
+  border-radius: var(--radius-full);
+  font-size: 0.9rem;
+  letter-spacing: 0.04em;
+  text-decoration: none;
+  transition: top 0.3s ease;
+  box-shadow: var(--shadow-md);
+}
+.skip-link:focus {
+  top: 12px;
+}
+
+/* Focus visible ring for all interactive elements */
+:focus-visible {
+  outline: 2.5px solid var(--pink-rose);
+  outline-offset: 3px;
+}
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible {
+  outline: 2.5px solid var(--pink-rose);
+  outline-offset: 2px;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  html { scroll-behavior: auto; }
+}
+
+/* ═══════════════════════════════════
+   Responsive Design — 4-tier system
+   ═══════════════════════════════════ */
+
+/* ── Tier 1: Large Desktop (1200px+) ── */
+@media (min-width: 1200px) {
+  .section { padding: 120px 32px; }
+  .hero-names { font-size: clamp(3.5rem, 4.5vw, 5rem); }
+  .album-grid { grid-template-columns: repeat(4, 1fr); gap: 20px; }
+}
+
+/* ── Tier 2: Tablet & Small Desktop (640px-1200px) ── */
+@media (max-width: 1199px) {
+  .section { padding: clamp(48px, 8vw, 80px) clamp(16px, 3vw, 32px); }
+  .section-title { font-size: clamp(1.4rem, 3vw, 2rem); }
+  .hero-names { font-size: clamp(2rem, 5vw, 3.5rem); }
+  .hero-and { font-size: clamp(1.1rem, 2.5vw, 1.6rem); }
+  .hero-subtitle { font-size: clamp(0.88rem, 1.8vw, 1.05rem); }
+  .countdown-num { font-size: clamp(1.6rem, 3vw, 2.4rem); }
+  .countdown-label { font-size: clamp(0.68rem, 1.2vw, 0.78rem); }
+  .profile-grid { grid-template-columns: 1fr 1fr; gap: clamp(16px, 2vw, 24px); }
+  .album-grid { grid-template-columns: repeat(2, 1fr); gap: clamp(8px, 1.5vw, 16px); }
+  .diary-grid { grid-template-columns: repeat(2, 1fr); gap: clamp(12px, 2vw, 20px); }
+  .message-grid { grid-template-columns: repeat(2, 1fr); gap: clamp(10px, 1.5vw, 16px); }
+  .login-card { max-width: clamp(360px, 85vw, 420px); }
+}
+
+/* ── Tier 3: Mobile (400px-640px) ── */
+@media (max-width: 640px) {
+  .section { padding: 48px 16px; }
+  .section:last-child { padding-bottom: 120px; }
+  .section-title { font-size: 1.35rem; }
+  .hero-names { font-size: 1.8rem; }
+  .hero-and { font-size: 1.05rem; }
+  .hero-subtitle { font-size: 0.85rem; }
+  .countdown-num { font-size: 1.5rem; }
+  .countdown-card { padding: 18px 8px; }
+  .countdown-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .profile-grid { grid-template-columns: 1fr; max-width: 420px; }
+  .album-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .diary-grid { grid-template-columns: 1fr; max-width: 480px; }
+  .message-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .nav { padding: 0 16px; }
   .nav-links { display: none; }
   .nav-links.open {
     display: flex;
@@ -1391,22 +1685,98 @@ body {
     position: absolute;
     top: 64px;
     left: 0; right: 0;
-    background: rgba(255,255,255,0.92);
-    backdrop-filter: blur(20px);
+    background: rgba(255,255,255,0.94);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
     padding: 20px;
     gap: 16px;
     border-bottom: 0.5px solid rgba(200,180,200,0.2);
-    box-shadow: var(--shadow-md);
+    box-shadow: var(--shadow-lg);
+    border-radius: 0 0 var(--radius-lg) var(--radius-lg);
   }
   .nav-toggle { display: flex; }
-  .carousel-btn.prev { left: 8px; }
-  .carousel-btn.next { right: 8px; }
-  .music-player { bottom: 16px; right: 16px; }
+  .carousel-btn.prev { left: 6px; }
+  .carousel-btn.next { right: 6px; }
+  .carousel-btn { width: 38px; height: 38px; }
+  .carousel-slide { font-size: clamp(2rem, 8vw, 3rem); }
+  .login-card { padding: 32px 24px; margin: 0 12px; }
+  .message-form { padding: 20px 16px; }
+  .music-container { bottom: 16px; right: 16px; }
+  .music-player-box iframe { width: 240px; height: 86px; }
+  .music-hint { bottom: 70px; right: 16px; font-size: 0.68rem; }
+  .back-to-top { bottom: 76px; right: 16px; width: 40px; height: 40px; }
+  .lightbox-nav { width: 40px; height: 40px; font-size: 1.2rem; }
+  .lightbox-nav.prev { left: 4px; }
+  .lightbox-nav.next { right: 4px; }
+  .lightbox-close { top: 12px; right: 12px; width: 38px; height: 38px; }
+  .lightbox-download { top: 12px; left: 12px; width: 38px; height: 38px; }
+  .section-header { margin-bottom: 40px; }
+  .timeline::before { left: 16px; }
+  .timeline-item { padding-left: 44px; margin-bottom: 32px; }
+  .timeline-dot { left: 7px; width: 18px; height: 18px; }
 }
 
-/* ═══════════════════════════════════
-   Mobile Touch Optimization & Very Small Screens
-   ═══════════════════════════════════ */
+/* ── Tier 4: Small Phone (320px-400px) ── */
+@media (max-width: 400px) {
+  .section { padding: 36px 10px; }
+  .section-title { font-size: 1.2rem; }
+  .hero { padding: 80px 10px 20px; min-height: auto; }
+  .hero-names { font-size: 1.4rem; }
+  .hero-and { font-size: 0.9rem; margin: 0 8px; }
+  .hero-subtitle { font-size: 0.78rem; }
+  .hero-heart { font-size: 1.1rem; }
+  .countdown-num { font-size: 1.3rem; }
+  .countdown-card { padding: 14px 6px; }
+  .countdown-grid { gap: 6px; }
+  .countdown-label { font-size: 0.65rem; }
+  .album-grid { grid-template-columns: 1fr 1fr; gap: 6px; }
+  .message-grid { grid-template-columns: 1fr; gap: 8px; }
+  .login-card { padding: 28px 16px; margin: 0 8px; }
+  .login-title { font-size: 1.4rem; }
+  .nav-logo { font-size: 1rem; }
+  .nav { height: 56px; }
+  .nav-links.open { top: 56px; }
+  .music-player-box iframe { width: 200px; height: 86px; }
+  .music-container { bottom: 10px; right: 10px; }
+  .music-toggle-btn { width: 42px; height: 42px; font-size: 1.1rem; }
+  .music-hint { bottom: 62px; right: 10px; }
+  .back-to-top { bottom: 62px; right: 10px; width: 36px; height: 36px; font-size: 1rem; }
+  .profile-card { padding: 24px 16px; }
+  .profile-avatar { width: 70px; height: 70px; font-size: 1.8rem; }
+  .profile-name { font-size: 1.2rem; }
+  .diary-card { padding: 14px; }
+  .message-card { padding: 14px; }
+  .timeline-card { padding: 14px 16px; }
+  .timeline-item { padding-left: 40px; margin-bottom: 28px; }
+  .timeline::before { left: 12px; }
+  .timeline-dot { left: 3px; width: 18px; height: 18px; }
+  .carousel-btn { width: 34px; height: 34px; }
+  .lightbox-nav { width: 34px; height: 34px; font-size: 1rem; }
+  .lightbox-nav.prev { left: 2px; }
+  .lightbox-nav.next { right: 2px; }
+  .lightbox-close { top: 8px; right: 8px; width: 34px; height: 34px; font-size: 1rem; }
+  .lightbox-download { top: 8px; left: 8px; width: 34px; height: 34px; font-size: 1rem; }
+  /* 超小屏导航项目间距缩小 */
+  .nav-links.open { padding: 14px; gap: 12px; }
+}
+
+/* ── Safari / iOS Specific Fixes ── */
+@supports (-webkit-touch-callout: none) {
+  /* iOS Safari 的 background-attachment: fixed 自动处理，无需额外代码 */
+  .nav, .login-card, .countdown-card, .profile-card,
+  .diary-card, .message-card, .timeline-card, .music-container {
+    -webkit-backdrop-filter: blur(16px) saturate(160%);
+  }
+  .music-toggle-btn {
+    -webkit-backdrop-filter: blur(16px) saturate(160%);
+  }
+}
+
+/* ── Legacy fallback for older mobile ── */
+@media (max-width: 560px) {
+  /* Preserved as catch-all for devices between old 560px breakpoint and new 640px */
+}
+
 /* 防止 iOS 双击缩放（不包括输入框） */
 *:not(input):not(textarea):not(select) { touch-action: manipulation; }
 
@@ -1415,52 +1785,19 @@ input, textarea, select {
   touch-action: auto;
   -webkit-user-select: text;
   user-select: text;
-  font-size: 16px; /* 防止 iOS Safari 自动放大 */
+  font-size: 16px;
 }
 @media screen and (-webkit-min-device-pixel-ratio:0) {
   input, textarea, select {
     font-size: 16px !important;
   }
 }
-
-@media (max-width: 380px) {
-  .section { padding: 36px 12px !important; }
-  .section-title { font-size: 1.2rem !important; }
-  .hero-names { font-size: 1.4rem !important; }
-  .hero-and { font-size: 1rem !important; }
-  .countdown-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 8px !important; }
-  .countdown-num { font-size: 1.5rem !important; }
-  .countdown-card { padding: 16px 8px !important; }
-  .profile-grid { grid-template-columns: 1fr !important; }
-  .album-grid { grid-template-columns: 1fr 1fr !important; gap: 8px !important; }
-  .diary-grid { grid-template-columns: 1fr !important; }
-  .message-grid { grid-template-columns: 1fr !important; }
-  .login-card { padding: 32px 20px !important; margin: 0 12px !important; }
-  .nav-logo { font-size: 1.1rem !important; }
-  .carousel-btn { width: 36px !important; height: 36px !important; }
-  .carousel-btn.prev { left: 4px !important; }
-  .carousel-btn.next { right: 4px !important; }
-  .music-player-box iframe { width: 220px !important; height: 86px !important; }
-  .music-container { bottom: 12px !important; right: 12px !important; }
-  .message-form { padding: 16px !important; }
-  .diary-card { padding: 14px !important; }
-  .back-to-top { bottom: 68px !important; right: 12px !important; width: 38px !important; height: 38px !important; }
-}
-
-@media (max-width: 560px) {
-  .section { padding: 48px 16px; }
-  .section-title { font-size: 1.4rem; }
-  .hero-names { font-size: 1.7rem; }
-  .countdown-num { font-size: 1.8rem; }
-  .countdown-card { padding: 20px 10px; }
-  .message-form { padding: 20px; }
-  .diary-card { padding: 18px; }
-  .carousel-slide { font-size: 2.5rem; }
-  .nav { padding: 0 16px; }
-}
 </style>
 </head>
 <body>
+
+<!-- Skip to content (a11y) -->
+<a href="#home" class="skip-link" aria-label="跳转到主要内容">跳到主要内容</a>
 
 <!-- ═══════════════ Login Overlay ═══════════════ -->
 <div class="login-overlay" id="loginOverlay">
@@ -1491,13 +1828,13 @@ input, textarea, select {
 <div class="sparkle-container" id="sparkleContainer"></div>
 
 <!-- ═══════════════ Navigation ═══════════════ -->
-<nav class="nav" id="navbar">
+<nav class="nav" id="navbar" role="navigation" aria-label="主导航">
   <div class="nav-inner">
-    <a href="#" class="nav-logo">♡ 王志德 & 杨秋燕</a>
-    <button class="nav-toggle" id="navToggle" aria-label="Menu">
+    <a href="#" class="nav-logo" aria-label="回到首页">♡ 王志德 & 杨秋燕</a>
+    <button class="nav-toggle" id="navToggle" aria-label="菜单" aria-expanded="false">
       <span></span><span></span><span></span>
     </button>
-    <ul class="nav-links" id="navLinks">
+    <ul class="nav-links" id="navLinks" role="list">
       <li><a href="#home">首页</a></li>
       <li><a href="#countdown">纪念日</a></li>
       <li><a href="#timeline">时间轴</a></li>
@@ -1678,9 +2015,15 @@ input, textarea, select {
 </footer>
 
 <!-- ═══════════════ Lightbox ═══════════════ -->
-<div class="lightbox" id="lightbox">
-  <button class="lightbox-close" id="lightboxClose">✕</button>
-  <div class="lightbox-content" id="lightboxContent"></div>
+<div class="lightbox" id="lightbox" role="dialog" aria-label="图片查看器" aria-hidden="true">
+  <button class="lightbox-close" id="lightboxClose" aria-label="关闭">✕</button>
+  <button class="lightbox-download" id="lightboxDownload" aria-label="下载图片" title="下载图片">⬇</button>
+  <button class="lightbox-nav prev" id="lightboxPrev" aria-label="上一张">◂</button>
+  <button class="lightbox-nav next" id="lightboxNext" aria-label="下一张">▸</button>
+  <div class="lightbox-img-wrapper" id="lightboxWrapper">
+    <img class="lightbox-content" id="lightboxContent" alt="" draggable="false">
+  </div>
+  <div class="lightbox-counter" id="lightboxCounter"></div>
 </div>
 
 <!-- ═══════════════ Toast ═══════════════ -->
@@ -1846,46 +2189,106 @@ function initTimeline() {
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   📸 图片上传功能 — 点击相册/合照的 📷 按钮上传照片
-   图片存储在 localStorage，换浏览器/清缓存会丢失
-   如需永久保存，替换下方 uploadImage() 中的存储逻辑
+   📸 图片管理系统 — 压缩、存储、加载、删除
    ═══════════════════════════════════════════════════════════════ */
-const IMAGE_STORE_KEY = 'love_album_images';
+const IMAGE_STORE_KEY = 'love_album_images_v2';
+const MAX_IMG_DIM = 1400;       // 最大边长（压缩目标）
+const COMPRESS_QUALITY = 0.72;  // JPEG 压缩质量
 
 function loadStoredImages() {
   try {
-    return JSON.parse(localStorage.getItem(IMAGE_STORE_KEY)) || {};
+    const raw = localStorage.getItem(IMAGE_STORE_KEY);
+    return raw ? JSON.parse(raw) : {};
   } catch(e) { return {}; }
 }
 
 function saveStoredImages(images) {
   try {
     localStorage.setItem(IMAGE_STORE_KEY, JSON.stringify(images));
+    return true;
   } catch(e) {
-    showGlobalToast('⚠️ 图片太大，存储空间不足，请使用较小的图片');
+    // 尝试清理旧数据腾空间
+    showGlobalToast('⚠️ 存储空间不足，请清理一些旧照片');
+    return false;
   }
 }
 
-function uploadImage(key, callback) {
+/** Canvas 图片压缩 */
+function compressImage(file) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = function() {
+      URL.revokeObjectURL(url);
+      let { width, height } = img;
+      // 超过最大尺寸才压缩
+      if (width <= MAX_IMG_DIM && height <= MAX_IMG_DIM && file.size < 800 * 1024) {
+        const reader = new FileReader();
+        reader.onload = function(e) { resolve(e.target.result); };
+        reader.readAsDataURL(file);
+        return;
+      }
+      // 等比缩放
+      if (width > height) {
+        if (width > MAX_IMG_DIM) { height *= MAX_IMG_DIM / width; width = MAX_IMG_DIM; }
+      } else {
+        if (height > MAX_IMG_DIM) { width *= MAX_IMG_DIM / height; height = MAX_IMG_DIM; }
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = Math.round(width);
+      canvas.height = Math.round(height);
+      const ctx = canvas.getContext('2d');
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      resolve(canvas.toDataURL('image/jpeg', COMPRESS_QUALITY));
+    };
+    img.onerror = function() {
+      URL.revokeObjectURL(url);
+      reject(new Error('图片加载失败'));
+    };
+    img.src = url;
+  });
+}
+
+/** 删除图片 */
+function deleteStoredImage(key) {
+  const images = loadStoredImages();
+  if (images[key]) {
+    delete images[key];
+    saveStoredImages(images);
+    return true;
+  }
+  return false;
+}
+
+/** 上传图片（含压缩和加载态） */
+function uploadImage(key, loadingEl, successCallback) {
   const input = document.createElement('input');
   input.type = 'file';
   input.accept = 'image/*';
-  input.onchange = function() {
+  input.onchange = async function() {
     const file = input.files[0];
     if (!file) return;
-    if (file.size > 4 * 1024 * 1024) {
-      showGlobalToast('⚠️ 图片不能超过 4MB');
+    if (!file.type.startsWith('image/')) {
+      showGlobalToast('⚠️ 请选择图片文件');
       return;
     }
-    const reader = new FileReader();
-    reader.onload = function(e) {
+    // 显示加载态
+    if (loadingEl) loadingEl.classList.add('active');
+    try {
+      const compressed = await compressImage(file);
       const images = loadStoredImages();
-      images[key] = e.target.result;
-      saveStoredImages(images);
-      if (callback) callback(e.target.result);
+      images[key] = compressed;
+      if (saveStoredImages(images) && successCallback) {
+        successCallback(compressed);
+      }
       showGlobalToast('📸 图片已保存！');
-    };
-    reader.readAsDataURL(file);
+    } catch(err) {
+      showGlobalToast('⚠️ 图片处理失败，请重试');
+    } finally {
+      if (loadingEl) loadingEl.classList.remove('active');
+    }
   };
   input.click();
 }
@@ -1897,76 +2300,189 @@ function applyStoredImage(element, key) {
     element.style.backgroundSize = 'cover';
     element.style.backgroundPosition = 'center';
     element.classList.add('has-image');
+    return true;
   }
+  return false;
 }
 
 /* ───────── Album ───────── */
 function initAlbum() {
   const grid = document.getElementById('albumGrid');
   grid.innerHTML = LOVE_CONFIG.album.map((item, i) => `
-    <div class="album-item" data-index="${i}" id="albumItem${i}">
+    <div class="album-item" data-index="${i}" id="albumItem${i}" tabindex="0" role="button" aria-label="查看照片：${item.title}">
       <div class="album-placeholder">
         <span class="album-emoji">${item.emoji}</span>
         <span>${item.title}</span>
       </div>
+      <div class="album-img-badge" id="badgeAlbum${i}">📸 已上传</div>
+      <div class="album-loading-overlay" id="loadingAlbum${i}">
+        <div class="album-spinner"></div>
+      </div>
       <div class="album-overlay"><span>${item.desc}</span></div>
-      <button class="album-upload-btn" title="上传照片" onclick="event.stopPropagation();uploadImage('album_${i}', function(url){ applyStoredImage(document.getElementById('albumItem${i}'), 'album_${i}'); });">📷</button>
+      <div class="album-actions">
+        <button class="album-action-btn upload-btn" title="上传照片" aria-label="上传照片到${item.title}" onclick="event.stopPropagation();uploadImage('album_${i}', document.getElementById('loadingAlbum${i}'), function(url){ applyStoredImage(document.getElementById('albumItem${i}'), 'album_${i}'); });">📷</button>
+        <button class="album-action-btn delete-btn" title="删除照片" aria-label="删除${item.title}的照片" onclick="event.stopPropagation();handleDeleteAlbum(${i});">🗑</button>
+      </div>
     </div>`).join('');
 
-  // Apply stored images
+  // 应用已存储的图片
   for (let i = 0; i < LOVE_CONFIG.album.length; i++) {
     applyStoredImage(document.getElementById('albumItem' + i), 'album_' + i);
   }
 
-  // Lightbox logic
-  const lightbox = document.getElementById('lightbox');
-  const lightboxContent = document.getElementById('lightboxContent');
+  // 统一灯箱事件绑定
+  bindAlbumLightbox();
+}
+
+function handleDeleteAlbum(index) {
+  const key = 'album_' + index;
+  if (deleteStoredImage(key)) {
+    const el = document.getElementById('albumItem' + index);
+    if (el) {
+      el.style.backgroundImage = '';
+      el.classList.remove('has-image');
+    }
+    showGlobalToast('🗑 照片已删除');
+  }
+}
+
+/* ───────── 灯箱图片源管理 ───────── */
+let lightboxSources = [];    // [{ src, title, emoji, color1, color2 }]
+let lightboxIndex = 0;
+
+function openLightbox(sources, startIndex) {
+  lightboxSources = sources;
+  lightboxIndex = startIndex;
+  const lb = document.getElementById('lightbox');
+  const wrapper = document.getElementById('lightboxWrapper');
+  // 重置缩放状态
+  wrapper.style.transform = '';
+  wrapper.classList.remove('zoomed');
+  showLightboxSlide(lightboxIndex);
+  lb.classList.add('active');
+  lb.setAttribute('aria-hidden', 'false');
+  document.body.style.overflow = 'hidden';
+}
+
+function showLightboxSlide(index) {
+  const img = document.getElementById('lightboxContent');
+  const counter = document.getElementById('lightboxCounter');
+  const downloadBtn = document.getElementById('lightboxDownload');
+  const source = lightboxSources[index];
+  if (!source) return;
+
+  if (source.src) {
+    img.src = source.src;
+    img.style.display = '';
+    downloadBtn.classList.add('visible');
+    downloadBtn.onclick = function() {
+      const a = document.createElement('a');
+      a.href = source.src;
+      a.download = source.title ? source.title.replace(/[^\u4e00-\u9fa5\w]/g, '_') + '.jpg' : 'photo.jpg';
+      a.click();
+    };
+  } else {
+    // 无图片时显示空状态
+    img.src = '';
+    img.style.display = 'none';
+    downloadBtn.classList.remove('visible');
+    downloadBtn.onclick = null;
+    // 用 placeholder 代替（简化处理——显示标题）
+    counter.textContent = `📷 ${source.title || ''} — 暂无照片`;
+    lightboxIndex = index;
+    return;
+  }
+  counter.textContent = lightboxSources.length > 1
+    ? `${index + 1} / ${lightboxSources.length}  ${source.title || ''}`
+    : source.title || '';
+  lightboxIndex = index;
+}
+
+function closeLightbox() {
+  const lb = document.getElementById('lightbox');
+  const wrapper = document.getElementById('lightboxWrapper');
+  lb.classList.remove('active');
+  lb.setAttribute('aria-hidden', 'true');
+  document.body.style.overflow = '';
+  wrapper.style.transform = '';
+  wrapper.classList.remove('zoomed');
+  document.getElementById('lightboxContent').src = '';
+}
+
+function bindAlbumLightbox() {
+  const grid = document.getElementById('albumGrid');
   grid.querySelectorAll('.album-item').forEach(item => {
+    const idx = parseInt(item.dataset.index);
+    const data = LOVE_CONFIG.album[idx];
+    const images = loadStoredImages();
+    const imgKey = 'album_' + idx;
+
     item.addEventListener('click', (e) => {
-      if (e.target.closest('.album-upload-btn')) return;
-      const idx = parseInt(item.dataset.index);
-      const data = LOVE_CONFIG.album[idx];
-      const images = loadStoredImages();
-      const imgKey = 'album_' + idx;
-      if (images[imgKey]) {
-        lightboxContent.innerHTML = `<img src="${images[imgKey]}" style="max-width:90vw;max-height:85vh;border-radius:16px;box-shadow:0 0 40px rgba(220,180,200,0.3);" alt="${data.desc}">`;
-      } else {
-        lightboxContent.innerHTML = `
-          <div style="width:min(85vw,560px);aspect-ratio:1;background:linear-gradient(135deg,${data.color1},${data.color2});border-radius:20px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;">
-            <div style="font-size:6rem;">${data.emoji}</div>
-            <div style="color:#fff;font-size:1rem;letter-spacing:0.06em;text-shadow:0 1px 4px rgba(0,0,0,0.2);">${data.desc}</div>
-          </div>`;
+      if (e.target.closest('.album-action-btn')) return;
+      const src = images[imgKey] || null;
+      openLightbox([{
+        src: src,
+        title: data.title,
+        emoji: data.emoji,
+        color1: data.color1,
+        color2: data.color2
+      }], 0);
+    });
+
+    // 键盘 Enter/Space 打开
+    item.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        item.click();
       }
-      lightbox.classList.add('active');
     });
   });
+}
+
+function handleDeleteCarousel(index) {
+  const key = 'carousel_' + index;
+  if (deleteStoredImage(key)) {
+    const el = document.getElementById('carouselSlide' + index);
+    if (el) {
+      el.style.backgroundImage = '';
+      el.classList.remove('has-image');
+    }
+    showGlobalToast('🗑 照片已删除');
+  }
 }
 
 /* ───────── Carousel ───────── */
 function initCarousel() {
   const track = document.getElementById('carouselTrack');
   const dots = document.getElementById('carouselDots');
+  const total = LOVE_CONFIG.carousel.length;
+
   track.innerHTML = LOVE_CONFIG.carousel.map((item, i) => `
     <div class="carousel-slide" id="carouselSlide${i}" style="background: linear-gradient(135deg, ${item.color1}, ${item.color2});">
       <span class="carousel-emoji">${item.emoji}</span>
       <div class="carousel-slide-text">${item.text}</div>
-      <button class="carousel-upload-btn" onclick="event.stopPropagation();uploadImage('carousel_${i}', function(url){ applyStoredImage(document.getElementById('carouselSlide${i}'), 'carousel_${i}'); });">📷</button>
+      <div class="carousel-loading-overlay" id="carouselLoading${i}">
+        <div class="album-spinner"></div>
+      </div>
+      <div class="carousel-actions">
+        <button class="carousel-action-btn upload-btn" title="上传照片" aria-label="上传照片: ${item.text}" onclick="event.stopPropagation();uploadImage('carousel_${i}', document.getElementById('carouselLoading${i}'), function(url){ applyStoredImage(document.getElementById('carouselSlide${i}'), 'carousel_${i}'); });">📷</button>
+        <button class="carousel-action-btn delete-btn" title="删除照片" aria-label="删除照片: ${item.text}" onclick="event.stopPropagation();handleDeleteCarousel(${i});">🗑</button>
+      </div>
     </div>`).join('');
 
   // Apply stored carousel images
-  for (let i = 0; i < LOVE_CONFIG.carousel.length; i++) {
-    applyStoredImage(document.getElementById('carouselSlide' + i), 'carousel_' + i);
+  for (let i = 0; i < total; i++) {
+    const el = document.getElementById('carouselSlide' + i);
+    applyStoredImage(el, 'carousel_' + i);
   }
 
   // Dots
   dots.innerHTML = '';
-  const slides = track.children;
-  const total = slides.length;
   let current = 0;
-
   for (let i = 0; i < total; i++) {
     const dot = document.createElement('button');
     dot.className = 'carousel-dot' + (i === 0 ? ' active' : '');
+    dot.setAttribute('aria-label', `第${i+1}张`);
     dot.addEventListener('click', () => goTo(i));
     dots.appendChild(dot);
   }
@@ -1986,12 +2502,46 @@ function initCarousel() {
     goTo((current + 1) % total);
   });
 
-  let autoPlay = setInterval(() => goTo((current + 1) % total), 4000);
-  const carouselWrap = document.querySelector('.carousel-wrap');
-  carouselWrap.addEventListener('mouseenter', () => clearInterval(autoPlay));
-  carouselWrap.addEventListener('mouseleave', () => {
-    autoPlay = setInterval(() => goTo((current + 1) % total), 4000);
+  // Touch swipe support
+  let touchStartX = 0;
+  let touchStartY = 0;
+  const carouselView = document.querySelector('.carousel-view');
+  carouselView.addEventListener('touchstart', (e) => {
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+  }, { passive: true });
+  carouselView.addEventListener('touchend', (e) => {
+    const dx = e.changedTouches[0].clientX - touchStartX;
+    const dy = e.changedTouches[0].clientY - touchStartY;
+    // 水平滑动且幅度 > 50px 且大于垂直滑动
+    if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy)) {
+      if (dx > 0) goTo((current - 1 + total) % total);
+      else goTo((current + 1) % total);
+    }
   });
+
+  // Keyboard navigation
+  const carouselWrap = document.querySelector('.carousel-wrap');
+  carouselWrap.setAttribute('tabindex', '0');
+  carouselWrap.setAttribute('role', 'region');
+  carouselWrap.setAttribute('aria-label', '合照轮播');
+  carouselWrap.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowLeft') { e.preventDefault(); goTo((current - 1 + total) % total); }
+    if (e.key === 'ArrowRight') { e.preventDefault(); goTo((current + 1) % total); }
+  });
+
+  // Auto play with pause on interaction
+  let autoPlay = setInterval(() => goTo((current + 1) % total), 4000);
+  const pauseAutoPlay = () => clearInterval(autoPlay);
+  const resumeAutoPlay = () => {
+    clearInterval(autoPlay);
+    autoPlay = setInterval(() => goTo((current + 1) % total), 4000);
+  };
+  carouselWrap.addEventListener('mouseenter', pauseAutoPlay);
+  carouselWrap.addEventListener('mouseleave', resumeAutoPlay);
+  carouselWrap.addEventListener('focusin', pauseAutoPlay);
+  carouselWrap.addEventListener('focusout', resumeAutoPlay);
+  carouselView.addEventListener('touchstart', pauseAutoPlay, { once: true });
 }
 
 // 全局 toast
@@ -2009,7 +2559,7 @@ function initMusic() {
   const iframe = document.createElement('iframe');
   iframe.id = 'neteaseIframe';
   iframe.allow = 'autoplay; encrypted-media';
-  iframe.style.cssText = 'width:300px;height:90px;border:none;display:block;';
+  iframe.style.cssText = 'width:100%;height:90px;border:none;display:block;';
   iframe.src = `https://music.163.com/outchain/player?type=2&id=${LOVE_CONFIG.neteaseSongId}&auto=1&height=90`;
   box.appendChild(iframe);
   box.classList.add('show');
@@ -2091,14 +2641,28 @@ function initMusic() {
   const nav = document.getElementById('navbar');
   const toggle = document.getElementById('navToggle');
   const links = document.getElementById('navLinks');
+
+  let ticking = false;
   window.addEventListener('scroll', () => {
-    nav.classList.toggle('scrolled', window.scrollY > 60);
+    if (!ticking) {
+      requestAnimationFrame(() => {
+        nav.classList.toggle('scrolled', window.scrollY > 60);
+        ticking = false;
+      });
+      ticking = true;
+    }
   });
+
   toggle.addEventListener('click', () => {
-    links.classList.toggle('open');
+    const isOpen = links.classList.toggle('open');
+    toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
   });
+
   links.querySelectorAll('a').forEach(a => {
-    a.addEventListener('click', () => links.classList.remove('open'));
+    a.addEventListener('click', () => {
+      links.classList.remove('open');
+      toggle.setAttribute('aria-expanded', 'false');
+    });
   });
 })();
 
@@ -2195,16 +2759,137 @@ let scrollObserver;
   });
 })();
 
-/* ───────── Lightbox Close Handlers ───────── */
+/* ───────── Lightbox: Pinch Zoom + Keyboard + Touch Dismiss ───────── */
 (function() {
-  const lightbox = document.getElementById('lightbox');
-  document.getElementById('lightboxClose').addEventListener('click', () => lightbox.classList.remove('active'));
-  lightbox.addEventListener('click', (e) => {
-    if (e.target === lightbox) lightbox.classList.remove('active');
+  const lb = document.getElementById('lightbox');
+  const wrapper = document.getElementById('lightboxWrapper');
+  const img = document.getElementById('lightboxContent');
+  const closeBtn = document.getElementById('lightboxClose');
+  const prevBtn = document.getElementById('lightboxPrev');
+  const nextBtn = document.getElementById('lightboxNext');
+
+  // Zoom state
+  let scale = 1;
+  let translateX = 0, translateY = 0;
+  let initialPinchDistance = 0;
+  let initialScale = 1;
+  let lastTapTime = 0;
+
+  function resetZoom() {
+    scale = 1;
+    translateX = 0;
+    translateY = 0;
+    applyTransform();
+    wrapper.classList.remove('zoomed');
+  }
+
+  function applyTransform() {
+    wrapper.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
+    wrapper.style.transition = 'transform 0.1s ease-out';
+  }
+
+  // Close
+  function doClose() { closeLightbox(); resetZoom(); }
+  closeBtn.addEventListener('click', doClose);
+  lb.addEventListener('click', (e) => {
+    if (e.target === lb || e.target === wrapper) doClose();
   });
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') lightbox.classList.remove('active');
+    if (!lb.classList.contains('active')) return;
+    if (e.key === 'Escape') { e.preventDefault(); doClose(); }
+    if (e.key === 'ArrowLeft' && lightboxSources.length > 1) {
+      e.preventDefault();
+      const idx = (lightboxIndex - 1 + lightboxSources.length) % lightboxSources.length;
+      resetZoom();
+      showLightboxSlide(idx);
+    }
+    if (e.key === 'ArrowRight' && lightboxSources.length > 1) {
+      e.preventDefault();
+      const idx = (lightboxIndex + 1) % lightboxSources.length;
+      resetZoom();
+      showLightboxSlide(idx);
+    }
   });
+
+  // Nav buttons
+  prevBtn.addEventListener('click', (e) => { e.stopPropagation();
+    if (lightboxSources.length > 1) { resetZoom(); showLightboxSlide((lightboxIndex - 1 + lightboxSources.length) % lightboxSources.length); }
+  });
+  nextBtn.addEventListener('click', (e) => { e.stopPropagation();
+    if (lightboxSources.length > 1) { resetZoom(); showLightboxSlide((lightboxIndex + 1) % lightboxSources.length); }
+  });
+
+  // Double tap zoom
+  img.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const now = Date.now();
+    if (now - lastTapTime < 300) {
+      // Double tap → toggle zoom
+      if (scale > 1) { resetZoom(); }
+      else { scale = 2.5; translateX = 0; translateY = 0; applyTransform(); wrapper.classList.add('zoomed'); }
+    }
+    lastTapTime = now;
+  });
+
+  // Pinch zoom
+  wrapper.addEventListener('touchstart', (e) => {
+    if (e.touches.length === 2) {
+      e.preventDefault();
+      initialPinchDistance = Math.hypot(
+        e.touches[0].clientX - e.touches[1].clientX,
+        e.touches[0].clientY - e.touches[1].clientY
+      );
+      initialScale = scale;
+    }
+  }, { passive: false });
+
+  wrapper.addEventListener('touchmove', (e) => {
+    if (e.touches.length === 2) {
+      e.preventDefault();
+      const dist = Math.hypot(
+        e.touches[0].clientX - e.touches[1].clientX,
+        e.touches[0].clientY - e.touches[1].clientY
+      );
+      scale = Math.min(5, Math.max(0.8, initialScale * (dist / initialPinchDistance)));
+      applyTransform();
+      if (scale > 1.05) wrapper.classList.add('zoomed');
+      else wrapper.classList.remove('zoomed');
+    }
+  }, { passive: false });
+
+  // Mouse wheel zoom (desktop)
+  wrapper.addEventListener('wheel', (e) => {
+    if (!lb.classList.contains('active')) return;
+    e.preventDefault();
+    const delta = e.deltaY > 0 ? -0.15 : 0.15;
+    scale = Math.min(5, Math.max(0.8, scale + delta));
+    applyTransform();
+    if (scale > 1.05) wrapper.classList.add('zoomed');
+    else { resetZoom(); }
+  }, { passive: false });
+
+  // Swipe to dismiss (mobile)
+  let swipeStartY = 0;
+  wrapper.addEventListener('touchstart', function(e) {
+    if (e.touches.length === 1 && scale <= 1) {
+      swipeStartY = e.touches[0].clientY;
+    }
+  }, { passive: true });
+  wrapper.addEventListener('touchend', function(e) {
+    if (scale > 1) return;
+    const dy = e.changedTouches[0].clientY - swipeStartY;
+    if (Math.abs(dy) > 100) {
+      doClose();
+    }
+  });
+
+  // Update visibility of nav/counter based on sources count
+  const observer = new MutationObserver(() => {
+    const hasMultiple = lightboxSources.length > 1;
+    prevBtn.style.display = hasMultiple ? '' : 'none';
+    nextBtn.style.display = hasMultiple ? '' : 'none';
+  });
+  observer.observe(lb, { attributes: true, attributeFilter: ['class'] });
 })();
 
 /* ───────── Music Player (NetEase Cloud Music) ───────── */
@@ -2229,11 +2914,18 @@ let scrollObserver;
 /* ───────── Back to Top ───────── */
 (function() {
   const btn = document.getElementById('backToTop');
+  let ticking = false;
   btn.addEventListener('click', () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   });
   window.addEventListener('scroll', () => {
-    btn.classList.toggle('visible', window.scrollY > 500);
+    if (!ticking) {
+      requestAnimationFrame(() => {
+        btn.classList.toggle('visible', window.scrollY > 500);
+        ticking = false;
+      });
+      ticking = true;
+    }
   });
 })();
 
