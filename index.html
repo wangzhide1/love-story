@@ -31,7 +31,6 @@
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"WebSite","name":"王志德 & 杨秋燕 · 我们的纪念日","url":"https://wangzhide1.github.io/love-story/","description":"专属恋爱纪念空间 · 相识于2024年7月","inLanguage":"zh-CN"}
 </script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js" async onerror="window._sb_failed=1"></script>
 <style>
 /* ═══════════════════════════════════
    CSS Variables & Design Tokens
@@ -2523,55 +2522,62 @@ input, textarea, select {
 
 <!-- ═══════════════ SCRIPTS ═══════════════ -->
 <script>
-/* ═══════════════ Supabase 实时同步 ═══════════════ */
-const SUPABASE_URL = 'https://yjjoiejhbczmbpgztbuo.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_y4XUcGLTbOnWBsp33XTavw_QJpiAzkD';
-var _supabase = null;
+/* ═══════════════ Supabase 实时同步（原生 fetch，零依赖） ═══════════════ */
+const SB_URL = 'https://yjjoiejhbczmbpgztbuo.supabase.co/rest/v1/shared_config';
+const SB_KEY = 'sb_publishable_y4XUcGLTbOnWBsp33XTavw_QJpiAzkD';
+var _sbCache = null; // 已加载的配置缓存
 
-function _initSupabase() {
-  if (_supabase) return;
-  if (typeof supabase === 'undefined') return;
-  try { _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY); } catch(e) { _supabase = null; }
-}
-
-// 从 Supabase 加载配置（失败回退 localStorage）
+// 从 Supabase 加载配置
 async function _loadFromSupabase() {
-  _initSupabase();
-  if (!_supabase) return null;
   try {
-    var res = await _supabase.from('shared_config').select('data').eq('id', 1).single();
-    if (res.error) { console.warn('Supabase load:', res.error.message); return null; }
-    if (res.data && res.data.data) return res.data.data;
-  } catch(e) { console.error('Supabase load error:', e); }
+    var res = await fetch(SB_URL + '?id=eq.1&select=data', {
+      headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY }
+    });
+    if (!res.ok) return null;
+    var rows = await res.json();
+    if (rows && rows[0] && rows[0].data) {
+      _sbCache = rows[0].data;
+      return rows[0].data;
+    }
+  } catch(e) {}
   return null;
 }
 
-// 保存到 Supabase
+// 保存到 Supabase（upsert）
 async function _saveToSupabase(cfg) {
-  _initSupabase();
-  if (!_supabase) return false;
   try {
-    var res = await _supabase.from('shared_config').upsert({ id: 1, data: cfg, updated_at: new Date().toISOString() });
-    if (res.error) { console.warn('Supabase save:', res.error.message); return false; }
-    return true;
-  } catch(e) { console.error('Supabase save error:', e); return false; }
+    var res = await fetch(SB_URL, {
+      method: 'POST',
+      headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Content-Type': 'application/json', 'Prefer': 'resolution=merge-duplicates' },
+      body: JSON.stringify({ id: 1, data: cfg, updated_at: new Date().toISOString() })
+    });
+    _sbCache = cfg;
+    return res.ok;
+  } catch(e) { return false; }
 }
 
-// 订阅实时变更
+// 轮询检测变更（每 6 秒，替代 WebSocket 实时订阅）
+var _sbPollTimer = null;
 function _subscribeRealtime() {
-  _initSupabase();
-  if (!_supabase) return;
-  try {
-    _supabase.channel('config_changes')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'shared_config' }, function(payload) {
-        var nd = payload.new && payload.new.data;
-        if (nd && JSON.stringify(nd) !== JSON.stringify(window.CUSTOM_CONFIG)) {
+  if (_sbPollTimer) return;
+  _sbPollTimer = setInterval(async function() {
+    try {
+      var res = await fetch(SB_URL + '?id=eq.1&select=data', {
+        headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY }
+      });
+      if (!res.ok) return;
+      var rows = await res.json();
+      if (rows && rows[0] && rows[0].data) {
+        var nd = rows[0].data;
+        if (JSON.stringify(nd) !== JSON.stringify(_sbCache)) {
+          _sbCache = nd;
           window.CUSTOM_CONFIG = nd;
           loadCustomConfig();
           if (typeof initFromConfig === 'function') { try { initFromConfig(); } catch(e) {} }
         }
-      }).subscribe();
-  } catch(e) { console.error('Realtime sub error:', e); }
+      }
+    } catch(e) {}
+  }, 6000);
 }
 }
 
