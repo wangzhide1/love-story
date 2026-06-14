@@ -2474,9 +2474,13 @@ input, textarea, select {
       <!-- Tab: music -->
       <div class="edit-panel-tab-content" data-tab="music">
         <div class="edit-field">
-          <label>🎵 背景音乐</label>
-          <button class="edit-btn edit-btn-secondary" id="testMusicBtn" style="width:auto;padding:10px 20px;font-size:1rem;">🔊 切换音乐</button>
-          <span class="hint">点击按钮开启或关闭背景音乐。音乐由浏览器原生 AudioContext 生成，无需网络。</span>
+          <label>🎧 QQ音乐歌曲 ID（可选）</label>
+          <input type="text" id="editQqSongId" maxlength="20" inputmode="numeric" placeholder="如 001X0zQJ3GBlvV">
+          <span class="hint">打开QQ音乐歌曲分享链接，songid= 后面的字符串即为ID。留空则使用内置背景音。</span>
+        </div>
+        <div class="edit-field">
+          <button class="edit-btn edit-btn-secondary" id="testMusicBtn" style="width:auto;padding:10px 20px;font-size:1rem;">🔊 切换背景音乐</button>
+          <span class="hint">优先尝试QQ音乐，失败则使用内置 AudioContext 背景音。</span>
         </div>
       </div>
     </div>
@@ -2487,7 +2491,7 @@ input, textarea, select {
       <button class="edit-btn edit-btn-primary" id="editSaveBtn">💗 保存更改</button>
     </div>
     <div style="padding:0 16px 12px;text-align:center;">
-      <span class="hint">💡 导出配置后，对方可以通过「导入配置」同步数据，包括在线图片链接。上传到 GitHub 后双方都能看到。</span>
+      <span class="hint">💡 编辑后点「保存」→ 数据存你浏览器。要分享给对方：点「📤 导出配置」下载 JSON → 发给对方 → 对方点「📥 导入配置」即可同步。时间轴、日记、档案、相册、QQ音乐等全部同步。</span>
     </div>
   </div>
 </div>
@@ -2528,6 +2532,9 @@ const LOVE_CONFIG = {
   startDate: '2024-07-01',        // 相识日期（YYYY-MM-DD）
   boyPassword: '20060108',        // 男方密码（出生年月日）
   girlPassword: '200601105',      // 女方密码（出生年月日）
+
+  // ── 音乐 ──
+  qqSongId: '',                    // QQ音乐歌曲ID（可选）
 
   // ── 时间轴（按时间顺序，可以增删改） ──
   timeline: [
@@ -3033,59 +3040,76 @@ function showGlobalToast(text) {
   setTimeout(() => toast.classList.remove('show'), 2500);
 }
 
-// ═══════════════ 音乐：极简 AudioContext ═══════════════
-var _musicCtx = null, _musicOsc = null, _musicGain = null;
+// ═══════════════ 音乐：AudioContext + QQ音乐 ═══════════════
+var _musicCtx = null, _musicOsc = null, _musicGain = null, _qqAudio = null;
 
 function toggleMusic() {
   var btn = document.getElementById('musicToggleBtn');
   var box = document.getElementById('musicBox');
 
-  if (_musicCtx && _musicOsc) {
-    try { _musicOsc.stop(); } catch(e) {}
-    _musicOsc = null; _musicGain = null;
-    try { _musicCtx.close(); } catch(e) {}
-    _musicCtx = null;
+  // === 停止 ===
+  if (_musicCtx || _qqAudio) {
+    if (_musicOsc) { try { _musicOsc.stop(); } catch(e) {} _musicOsc = null; }
+    if (window._musicOsc2) { try { window._musicOsc2.stop(); } catch(e) {} window._musicOsc2 = null; }
+    _musicGain = null; window._musicGain2 = null;
+    if (_musicCtx) { try { _musicCtx.close(); } catch(e) {} _musicCtx = null; }
+    if (_qqAudio) { _qqAudio.pause(); _qqAudio.src = ''; _qqAudio = null; }
     if (btn) btn.textContent = '🔇';
     if (box) box.classList.remove('show');
+    var s = document.getElementById('musicStatus'); if (s) s.innerHTML = '';
     showGlobalToast('🔇 音乐已暂停');
     return;
   }
 
-  try {
-    _musicCtx = new (window.AudioContext || window.webkitAudioContext)();
-    _musicGain = _musicCtx.createGain();
-    _musicGain.gain.value = 0.06;
-    _musicGain.connect(_musicCtx.destination);
+  // === 播放 ===
+  var qqId = '';
+  try { var cc = JSON.parse(localStorage.getItem('love_custom_config')||'{}'); qqId = cc.qqSongId || (LOVE_CONFIG.qqSongId||''); } catch(e) {}
 
-    // 双层和声：低音 + 高音
-    _musicOsc = _musicCtx.createOscillator();
-    _musicOsc.type = 'sine';
-    _musicOsc.frequency.value = 330;
-    _musicOsc.connect(_musicGain);
-
-    var osc2 = _musicCtx.createOscillator();
-    osc2.type = 'sine';
-    osc2.frequency.value = 392;
-    var g2 = _musicCtx.createGain();
-    g2.gain.value = 0.04;
-    osc2.connect(g2);
-    g2.connect(_musicCtx.destination);
-
-    _musicOsc.start();
-    osc2.start();
-    window._musicOsc2 = osc2;
-    window._musicGain2 = g2;
-
-    if (btn) btn.textContent = '🎵';
-    if (box) box.classList.add('show');
-    // 显示状态
-    var s = document.getElementById('musicStatus');
-    if (!s && box) { s = document.createElement('div'); s.className = 'music-status'; s.id = 'musicStatus'; box.appendChild(s); }
-    if (s) s.innerHTML = '<div class="music-wave"><span></span><span></span><span></span><span></span><span></span></div><div class="music-info">♫ 正在播放<div><small>点击按钮切换暂停</small></div></div>';
-    showGlobalToast('🎵 音乐已开启 ♫');
-  } catch(e) {
-    showGlobalToast('⚠️ 音乐启动失败');
+  function startNativeTone() {
+    try {
+      _musicCtx = new (window.AudioContext || window.webkitAudioContext)();
+      _musicGain = _musicCtx.createGain(); _musicGain.gain.value = 0.06; _musicGain.connect(_musicCtx.destination);
+      _musicOsc = _musicCtx.createOscillator(); _musicOsc.type = 'sine'; _musicOsc.frequency.value = 330;
+      _musicOsc.connect(_musicGain);
+      var o2 = _musicCtx.createOscillator(); o2.type = 'sine'; o2.frequency.value = 392;
+      var g2 = _musicCtx.createGain(); g2.gain.value = 0.04; o2.connect(g2); g2.connect(_musicCtx.destination);
+      _musicOsc.start(); o2.start();
+      window._musicOsc2 = o2; window._musicGain2 = g2;
+      if (btn) btn.textContent = '🎵'; if (box) box.classList.add('show');
+      var s = document.getElementById('musicStatus');
+      if (!s && box) { s = document.createElement('div'); s.className = 'music-status'; s.id = 'musicStatus'; box.appendChild(s); }
+      if (s) s.innerHTML = '<div class="music-wave"><span></span><span></span><span></span><span></span><span></span></div><div class="music-info">♫ 内置背景音<div><small>点击按钮切换暂停</small></div></div>';
+      showGlobalToast('🎵 内置背景音已开启 ♫');
+    } catch(e) { showGlobalToast('⚠️ 音乐启动失败'); }
   }
+
+  // 有QQ歌曲ID → 先试QQ
+  if (qqId && qqId.trim()) {
+    if (btn) btn.textContent = '⏳'; if (box) box.classList.add('show');
+    var s2 = document.getElementById('musicStatus');
+    if (!s2 && box) { s2 = document.createElement('div'); s2.className = 'music-status'; s2.id = 'musicStatus'; box.appendChild(s2); }
+    if (s2) s2.innerHTML = '<div class="music-wave"><span></span><span></span><span></span><span></span><span></span></div><div class="music-info">♫ 连接QQ音乐...<div><small>加载失败将切换内置背景音</small></div></div>';
+
+    var a = new Audio();
+    a.loop = true; a.volume = 0.5; a.crossOrigin = 'anonymous';
+    a.src = 'https://dl.stream.qqmusic.qq.com/C400' + qqId.trim() + '.m4a?guid=1&vkey=&uin=&fromtag=9999';
+    var timer = setTimeout(function() { a.src = ''; a.remove(); startNativeTone(); }, 5000);
+    a.addEventListener('canplay', function() {
+      clearTimeout(timer);
+      a.play().then(function() {
+        _qqAudio = a;
+        if (btn) btn.textContent = '🎵';
+        var s3 = document.getElementById('musicStatus'); if (s3) s3.innerHTML = '<div class="music-wave"><span></span><span></span><span></span><span></span><span></span></div><div class="music-info">♫ QQ音乐<div><small>点击按钮切换暂停</small></div></div>';
+        showGlobalToast('🎵 QQ音乐已开启 ♫');
+      }).catch(function(){ startNativeTone(); });
+    });
+    a.addEventListener('error', function() { clearTimeout(timer); startNativeTone(); });
+    a.load();
+    return;
+  }
+
+  // 无QQ → 直接内置
+  startNativeTone();
 }
 
 // 兼容旧调用
@@ -3474,6 +3498,7 @@ function loadCustomConfig() {
   if (cfg.startDate !== undefined) LOVE_CONFIG.startDate = cfg.startDate;
   if (cfg.boyPassword !== undefined) LOVE_CONFIG.boyPassword = cfg.boyPassword;
   if (cfg.girlPassword !== undefined) LOVE_CONFIG.girlPassword = cfg.girlPassword;
+  if (cfg.qqSongId !== undefined) LOVE_CONFIG.qqSongId = cfg.qqSongId;
   if (cfg.heroSubtitle !== undefined) {
     var els = document.querySelectorAll('.hero-subtitle');
     for (var i = 0; i < els.length; i++) els[i].textContent = cfg.heroSubtitle;
@@ -3553,6 +3578,7 @@ function populateEditPanel() {
   safeSetValue('editGirlPw', lc('girlPassword', LOVE_CONFIG.girlPassword));
   safeSetValue('editHeroSubtitle', cfg.heroSubtitle || '');
   safeSetValue('editHeroDate', cfg.heroDate || '');
+  safeSetValue('editQqSongId', cfg.qqSongId || LOVE_CONFIG.qqSongId || '');
   safeSetValue('editBoyEmoji', (cfg.boy && cfg.boy.emoji) || LOVE_CONFIG.boy.emoji);
   safeSetValue('editBoyRole', (cfg.boy && cfg.boy.role) || LOVE_CONFIG.boy.role);
   safeSetValue('editBoyTags', (cfg.boy && cfg.boy.tags) ? cfg.boy.tags.join(',') : LOVE_CONFIG.boy.tags.join(','));
@@ -3696,6 +3722,7 @@ function saveEditPanel() {
   cfg.girlPassword = document.getElementById('editGirlPw').value;
   cfg.heroSubtitle = document.getElementById('editHeroSubtitle').value;
   cfg.heroDate = document.getElementById('editHeroDate').value;
+  cfg.qqSongId = document.getElementById('editQqSongId').value;
   // 个人档案
   cfg.boy = cfg.boy || {};
   cfg.boy.emoji = document.getElementById('editBoyEmoji').value;
