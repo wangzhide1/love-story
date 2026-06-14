@@ -31,6 +31,7 @@
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"WebSite","name":"王志德 & 杨秋燕 · 我们的纪念日","url":"https://wangzhide1.github.io/love-story/","description":"专属恋爱纪念空间 · 相识于2024年7月","inLanguage":"zh-CN"}
 </script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <style>
 /* ═══════════════════════════════════
    CSS Variables & Design Tokens
@@ -2522,6 +2523,46 @@ input, textarea, select {
 
 <!-- ═══════════════ SCRIPTS ═══════════════ -->
 <script>
+/* ═══════════════ Supabase 实时同步 ═══════════════ */
+const SUPABASE_URL = 'https://yjjoiejhbczmbpgztbuo.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_y4XUcGLTbOnWBsp33XTavw_QJpiAzkD';
+var _supabase = null;
+try { _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY); } catch(e) { _supabase = null; }
+
+// 从 Supabase 加载配置（失败回退 localStorage）
+async function _loadFromSupabase() {
+  if (!_supabase) return null;
+  try {
+    var res = await _supabase.from('shared_config').select('data').eq('id', 1).single();
+    if (res.data && res.data.data) return res.data.data;
+  } catch(e) {}
+  return null;
+}
+
+// 保存到 Supabase
+async function _saveToSupabase(cfg) {
+  if (!_supabase) return false;
+  try {
+    await _supabase.from('shared_config').upsert({ id: 1, data: cfg, updated_at: new Date().toISOString() });
+    return true;
+  } catch(e) { return false; }
+}
+
+// 订阅实时变更
+function _subscribeRealtime() {
+  if (!_supabase) return;
+  try {
+    _supabase.channel('config_changes')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'shared_config' }, function(payload) {
+        var nd = payload.new && payload.new.data;
+        if (nd && JSON.stringify(nd) !== JSON.stringify(window.CUSTOM_CONFIG)) {
+          window.CUSTOM_CONFIG = nd;
+          setTimeout(function() { location.reload(); }, 500);
+        }
+      }).subscribe();
+  } catch(e) {}
+}
+
 /* ═══════════════════════════════════════════════════════════════
    📝 自定义配置区 — 修改这里即可改变整站内容！
    ═══════════════════════════════════════════════════════════════ */
@@ -3487,10 +3528,6 @@ window.initMusic = function() { toggleMusic(); };
    ═══════════════════════════════════════════════════════════════ */
 window.CUSTOM_CONFIG = {};
 function loadCustomConfig() {
-  try {
-    var raw = localStorage.getItem('love_custom_config');
-    if (raw) window.CUSTOM_CONFIG = JSON.parse(raw);
-  } catch(e) { window.CUSTOM_CONFIG = {}; }
   var cfg = window.CUSTOM_CONFIG;
   if (!LOVE_CONFIG) return;
   if (cfg.boyName !== undefined) LOVE_CONFIG.boyName = cfg.boyName;
@@ -3515,11 +3552,26 @@ function loadCustomConfig() {
   if (cfg.diary) LOVE_CONFIG.diary = cfg.diary;
   if (cfg.messages) LOVE_CONFIG.messages = cfg.messages;
 }
+
+// 初始化：先 Supabase → localStorage → 默认
+async function initConfig() {
+  var raw = null;
+  var supData = await _loadFromSupabase();
+  if (supData && Object.keys(supData).length > 0) {
+    raw = JSON.stringify(supData);
+  } else {
+    try { raw = localStorage.getItem('love_custom_config'); } catch(e) {}
+  }
+  try { if (raw) window.CUSTOM_CONFIG = JSON.parse(raw); } catch(e) {}
+  loadCustomConfig();
+  _subscribeRealtime();
+}
 function saveCustomConfig() {
-  try {
-    localStorage.setItem('love_custom_config', JSON.stringify(window.CUSTOM_CONFIG));
-    return true;
-  } catch(e) { showGlobalToast('⚠️ 保存失败，存储空间可能不足'); return false; }
+  var data = JSON.stringify(window.CUSTOM_CONFIG || {});
+  // 双写：localStorage + Supabase
+  try { localStorage.setItem('love_custom_config', data); } catch(e) {}
+  _saveToSupabase(window.CUSTOM_CONFIG || {});
+  return true;
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -3816,6 +3868,7 @@ function readDynamicList(type) {
   if (resetBtn) resetBtn.addEventListener('click', function() {
     if (confirm('确定恢复所有默认设置？自定义修改将被清除。')) {
       localStorage.removeItem('love_custom_config');
+      _saveToSupabase({});
       showGlobalToast('💗 已恢复默认，页面即将刷新...');
       setTimeout(function() { location.reload(); }, 1200);
     }
@@ -3868,7 +3921,7 @@ function readDynamicList(type) {
    🔧 在页面加载后应用自定义配置
    ═══════════════════════════════════════════════════════════════ */
 setTimeout(function() {
-  loadCustomConfig();
+  initConfig().then(function() {
   // 应用 hero 自定义文字
   var cfg = window.CUSTOM_CONFIG || {};
   if (cfg.heroSubtitle) {
@@ -3883,6 +3936,7 @@ setTimeout(function() {
   if (typeof initFromConfig === 'function') {
     try { initFromConfig(); } catch(e) {}
   }
+  });
 }, 500);
 </script>
 <!-- ═════════════ 修复脚本结束 ═════════════ -->
