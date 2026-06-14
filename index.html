@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
@@ -3179,39 +3179,6 @@ function initMusic() {
       a.src = src; a.load();
     }, 800);
   }
-}
-  showStatus('♫ 正在连接...', '尝试加载音乐');
-  var urls = [];
-  if (customUrl && customUrl.trim()) urls.push(customUrl.trim());
-  urls.push('https://music.163.com/song/media/outer/url?id=' + songId + '.mp3');
-  var tryIdx = 0;
-  function tryNext() {
-    if (tryIdx >= urls.length) {
-      showStatus('🎹 钢琴旋律', '已为你生成背景音乐');
-      _startWebAudioMusic();
-      var btn = document.getElementById('musicToggleBtn'); if (btn) btn.textContent = '🎵';
-      showGlobalToast('🎹 正在播放内置钢琴旋律');
-      return;
-    }
-    var src = urls[tryIdx]; tryIdx++;
-    var a = new Audio(); a.loop = true; a.volume = 0.5; a.crossOrigin = 'anonymous'; a.preload = 'auto';
-    var done = false;
-    function resolve(ok) {
-      if (done) return; done = true;
-      if (!ok) { a.src = ''; a.remove(); tryNext(); return; }
-      window._musicAudio = a;
-      var btn = document.getElementById('musicToggleBtn'); if (btn) btn.textContent = '🎵';
-      showStatus('♫ 正在播放', '点击按钮切换暂停'); showGlobalToast('🎵 音乐已开启 ♫');
-    }
-    a.addEventListener('canplay', function() { a.play().then(function() { resolve(true); }).catch(function() { resolve(false); }); });
-    a.addEventListener('error', function() { resolve(false); });
-    a.addEventListener('play', function() { var btn = document.getElementById('musicToggleBtn'); if (btn) btn.textContent = '🎵'; });
-    a.addEventListener('pause', function() { var btn = document.getElementById('musicToggleBtn'); if (btn) btn.textContent = '🔇'; });
-    setTimeout(function() { if (!done) resolve(false); }, 6000);
-    a.src = src; a.load();
-    setTimeout(function() { if (!done) a.play().catch(function(){}); }, 300);
-  }
-  tryNext();
 }
 
 /* ───────── Login System ───────── */
