@@ -31,7 +31,7 @@
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"WebSite","name":"王志德 & 杨秋燕 · 我们的纪念日","url":"https://wangzhide1.github.io/love-story/","description":"专属恋爱纪念空间 · 相识于2024年7月","inLanguage":"zh-CN"}
 </script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js" async onerror="window._sb_failed=1"></script>
 <style>
 /* ═══════════════════════════════════
    CSS Variables & Design Tokens
@@ -2527,10 +2527,16 @@ input, textarea, select {
 const SUPABASE_URL = 'https://yjjoiejhbczmbpgztbuo.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_y4XUcGLTbOnWBsp33XTavw_QJpiAzkD';
 var _supabase = null;
-try { _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY); } catch(e) { _supabase = null; }
+
+function _initSupabase() {
+  if (_supabase) return;
+  if (typeof supabase === 'undefined') return;
+  try { _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY); } catch(e) { _supabase = null; }
+}
 
 // 从 Supabase 加载配置（失败回退 localStorage）
 async function _loadFromSupabase() {
+  _initSupabase();
   if (!_supabase) return null;
   try {
     var res = await _supabase.from('shared_config').select('data').eq('id', 1).single();
@@ -2542,6 +2548,7 @@ async function _loadFromSupabase() {
 
 // 保存到 Supabase
 async function _saveToSupabase(cfg) {
+  _initSupabase();
   if (!_supabase) return false;
   try {
     var res = await _supabase.from('shared_config').upsert({ id: 1, data: cfg, updated_at: new Date().toISOString() });
@@ -2552,6 +2559,7 @@ async function _saveToSupabase(cfg) {
 
 // 订阅实时变更
 function _subscribeRealtime() {
+  _initSupabase();
   if (!_supabase) return;
   try {
     _supabase.channel('config_changes')
