@@ -2534,8 +2534,9 @@ async function _loadFromSupabase() {
   if (!_supabase) return null;
   try {
     var res = await _supabase.from('shared_config').select('data').eq('id', 1).single();
+    if (res.error) { console.warn('Supabase load:', res.error.message); return null; }
     if (res.data && res.data.data) return res.data.data;
-  } catch(e) {}
+  } catch(e) { console.error('Supabase load error:', e); }
   return null;
 }
 
@@ -2543,9 +2544,10 @@ async function _loadFromSupabase() {
 async function _saveToSupabase(cfg) {
   if (!_supabase) return false;
   try {
-    await _supabase.from('shared_config').upsert({ id: 1, data: cfg, updated_at: new Date().toISOString() });
+    var res = await _supabase.from('shared_config').upsert({ id: 1, data: cfg, updated_at: new Date().toISOString() });
+    if (res.error) { console.warn('Supabase save:', res.error.message); return false; }
     return true;
-  } catch(e) { return false; }
+  } catch(e) { console.error('Supabase save error:', e); return false; }
 }
 
 // 订阅实时变更
@@ -2557,10 +2559,12 @@ function _subscribeRealtime() {
         var nd = payload.new && payload.new.data;
         if (nd && JSON.stringify(nd) !== JSON.stringify(window.CUSTOM_CONFIG)) {
           window.CUSTOM_CONFIG = nd;
-          setTimeout(function() { location.reload(); }, 500);
+          loadCustomConfig();
+          if (typeof initFromConfig === 'function') { try { initFromConfig(); } catch(e) {} }
         }
       }).subscribe();
-  } catch(e) {}
+  } catch(e) { console.error('Realtime sub error:', e); }
+}
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -3544,13 +3548,13 @@ function loadCustomConfig() {
     var els = document.querySelectorAll('.hero-date');
     for (var i = 0; i < els.length; i++) els[i].textContent = cfg.heroDate;
   }
-  if (cfg.timeline) LOVE_CONFIG.timeline = cfg.timeline;
-  if (cfg.boy) LOVE_CONFIG.boy = cfg.boy;
-  if (cfg.girl) LOVE_CONFIG.girl = cfg.girl;
-  if (cfg.album) LOVE_CONFIG.album = cfg.album;
-  if (cfg.carousel) LOVE_CONFIG.carousel = cfg.carousel;
-  if (cfg.diary) LOVE_CONFIG.diary = cfg.diary;
-  if (cfg.messages) LOVE_CONFIG.messages = cfg.messages;
+  if (cfg.timeline !== undefined) LOVE_CONFIG.timeline = cfg.timeline;
+  if (cfg.boy !== undefined) LOVE_CONFIG.boy = cfg.boy;
+  if (cfg.girl !== undefined) LOVE_CONFIG.girl = cfg.girl;
+  if (cfg.album !== undefined) LOVE_CONFIG.album = cfg.album;
+  if (cfg.carousel !== undefined) LOVE_CONFIG.carousel = cfg.carousel;
+  if (cfg.diary !== undefined) LOVE_CONFIG.diary = cfg.diary;
+  if (cfg.messages !== undefined) LOVE_CONFIG.messages = cfg.messages;
 }
 
 // 初始化：先 Supabase → localStorage → 默认
@@ -3568,9 +3572,8 @@ async function initConfig() {
 }
 function saveCustomConfig() {
   var data = JSON.stringify(window.CUSTOM_CONFIG || {});
-  // 双写：localStorage + Supabase
   try { localStorage.setItem('love_custom_config', data); } catch(e) {}
-  _saveToSupabase(window.CUSTOM_CONFIG || {});
+  _saveToSupabase(window.CUSTOM_CONFIG || {}).catch(function(e) { console.error('saveCustomConfig:', e); });
   return true;
 }
 
@@ -3922,21 +3925,10 @@ function readDynamicList(type) {
    ═══════════════════════════════════════════════════════════════ */
 setTimeout(function() {
   initConfig().then(function() {
-  // 应用 hero 自定义文字
-  var cfg = window.CUSTOM_CONFIG || {};
-  if (cfg.heroSubtitle) {
-    var el = document.querySelector('.hero-subtitle');
-    if (el) el.textContent = cfg.heroSubtitle;
-  }
-  if (cfg.heroDate) {
-    var el = document.querySelector('.hero-date');
-    if (el) el.textContent = cfg.heroDate;
-  }
-  // 重新初始化页面内容
-  if (typeof initFromConfig === 'function') {
-    try { initFromConfig(); } catch(e) {}
-  }
-  });
+    if (typeof initFromConfig === 'function') {
+      try { initFromConfig(); } catch(e) {}
+    }
+  }).catch(function(e) { console.error('initConfig:', e); });
 }, 500);
 </script>
 <!-- ═════════════ 修复脚本结束 ═════════════ -->
