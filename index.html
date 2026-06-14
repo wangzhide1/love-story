@@ -8,12 +8,29 @@
 <meta property="og:title" content="王志德 & 杨秋燕 · 我们的纪念日">
 <meta property="og:description" content="专属恋爱空间 · 相识于2024年7月 · 记录我们的甜蜜故事">
 <meta property="og:type" content="website">
+<meta property="og:url" content="https://wangzhide1.github.io/love-story/">
+<meta property="og:image" content="https://wangzhide1.github.io/love-story/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="王志德 & 杨秋燕 · 我们的纪念日">
+<meta name="twitter:description" content="专属恋爱空间 · 相识于2024年7月 · 记录我们的甜蜜故事">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="我们的纪念日">
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💗</text></svg>">
+<link rel="manifest" href="data:application/json;charset=utf-8,%7B%22name%22%3A%22%E6%88%91%E4%BB%AC%E7%9A%84%E7%BA%AA%E5%BF%B5%E6%97%A5%22%2C%22short_name%22%3A%22%E7%BA%AA%E5%BF%B5%E6%97%A5%22%2C%22start_url%22%3A%22.%2F%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23fef9f4%22%2C%22theme_color%22%3A%22%23fef9f4%22%2C%22icons%22%3A%5B%5D%7D">
+<link rel="canonical" href="https://wangzhide1.github.io/love-story/">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💗</text></svg>">
 <title>王志德 & 杨秋燕 · 我们的纪念日</title>
 <!-- Google Fonts: 海外加载（国内被墙时 display=swap 确保文本立即可见，使用系统字体回退） -->
 <link href="https://fonts.googleapis.com/css2?family=ZCOOL+XiaoWei&family=Noto+Serif+SC:wght@300;400;500;600&display=swap" rel="stylesheet" crossorigin="anonymous">
 <!-- 国内镜像回退：chinese-fonts-cdn 提供无障碍字体服务 -->
 <link href="https://chinese-fonts-cdn.deno.dev/css2?family=ZCOOL+XiaoWei&family=Noto+Serif+SC:wght@300;400;500;600&display=swap" rel="stylesheet" crossorigin="anonymous">
+<!-- Schema.org structured data -->
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebSite","name":"王志德 & 杨秋燕 · 我们的纪念日","url":"https://wangzhide1.github.io/love-story/","description":"专属恋爱纪念空间 · 相识于2024年7月","inLanguage":"zh-CN"}
+</script>
 <style>
 /* ═══════════════════════════════════
    CSS Variables & Design Tokens
@@ -2135,7 +2152,7 @@ input, textarea, select {
     </div>
     <button class="login-btn" id="loginBtn">♡ 进入我们的世界</button>
     <p class="login-error" id="loginError"></p>
-    <p class="login-hint">💡 输入任意一方的出生年月日即可进入（如：20060108 或 20061105）</p>
+    <p class="login-hint">💡 输入任意一方的出生年月日即可进入（如：20060108 或 200601105）</p>
   </div>
 </div>
 
@@ -2340,7 +2357,7 @@ input, textarea, select {
   <button class="lightbox-nav prev" id="lightboxPrev" aria-label="上一张">◂</button>
   <button class="lightbox-nav next" id="lightboxNext" aria-label="下一张">▸</button>
   <div class="lightbox-img-wrapper" id="lightboxWrapper">
-    <img class="lightbox-content" id="lightboxContent" alt="" draggable="false">
+    <img class="lightbox-content" id="lightboxContent" alt="" draggable="false" loading="lazy" decoding="async">
   </div>
   <div class="lightbox-counter" id="lightboxCounter"></div>
 </div>
@@ -2385,7 +2402,7 @@ input, textarea, select {
           <input type="text" id="editBoyPw" maxlength="20" inputmode="numeric">
         </div>
         <div class="edit-field">
-          <label>女生密码（出生年月日，如 20061105）</label>
+          <label>女生密码（出生年月日，如 200601105）</label>
           <input type="text" id="editGirlPw" maxlength="20" inputmode="numeric">
         </div>
         <div class="edit-field">
@@ -2440,24 +2457,29 @@ input, textarea, select {
       <div class="edit-panel-tab-content" data-tab="music">
         <div class="edit-field">
           <label>🎵 自定义音乐链接（推荐）</label>
-          <input type="text" id="editMusicUrl" placeholder="粘贴任意 MP3 直链地址，如 https://example.com/music.mp3" maxlength="500">
-          <span class="hint">最可靠的方案！上传 MP3 到你的 GitHub 仓库后填写相对路径，如 ./lovemusic.mp3，或粘贴任何可公开访问的 MP3 链接。</span>
+          <input type="text" id="editMusicUrl" placeholder="粘贴任意 MP3 直链地址" maxlength="500">
+          <span class="hint">最可靠的方案！上传 MP3 到 GitHub 仓库后填写相对路径，如 ./lovemusic.mp3</span>
         </div>
-        <div class="edit-field" style="margin-top:16px;padding-top:16px;border-top:1px dashed rgba(200,180,200,0.3);">
+        <div class="edit-field">
           <label>🎶 备选：网易云音乐歌曲 ID</label>
           <input type="text" id="editSongId" maxlength="20" inputmode="numeric" placeholder="如 7564127027">
-          <span class="hint">如果自定义链接为空，将尝试使用网易云歌曲 ID。打开歌曲页，URL 中的数字即为 ID。</span>
+          <span class="hint">打开歌曲页，URL 中的数字即为歌曲 ID。</span>
         </div>
         <div class="edit-field">
           <label>音乐测试</label>
           <button class="edit-btn edit-btn-secondary" id="testMusicBtn" style="width:auto;padding:8px 18px;">🔊 测试播放</button>
-          <span class="hint">点击测试按钮，检查配置的音乐是否能正常播放。自定义链接优先。</span>
+          <span class="hint">点击测试当前配置的音乐是否能正常播放。</span>
         </div>
       </div>
     </div>
     <div class="edit-panel-actions">
       <button class="edit-btn edit-btn-secondary" id="editResetBtn">恢复默认</button>
+      <button class="edit-btn edit-btn-secondary" id="editExportBtn" style="font-size:0.78rem;">📤 导出配置</button>
+      <button class="edit-btn edit-btn-secondary" id="editImportBtn" style="font-size:0.78rem;">📥 导入配置</button>
       <button class="edit-btn edit-btn-primary" id="editSaveBtn">💗 保存更改</button>
+    </div>
+    <div style="padding:0 16px 12px;text-align:center;">
+      <span class="hint">💡 导出配置后，对方可以通过「导入配置」同步数据，包括在线图片链接。上传到 GitHub 后双方都能看到。</span>
     </div>
   </div>
 </div>
@@ -2497,7 +2519,7 @@ const LOVE_CONFIG = {
   girlName: '杨秋燕',
   startDate: '2024-07-01',        // 相识日期（YYYY-MM-DD）
   boyPassword: '20060108',        // 男方密码（出生年月日）
-  girlPassword: '20061105',       // 女方密码（出生年月日：2006-11-05）
+  girlPassword: '200601105',      // 女方密码（出生年月日）
 
   // ── 音乐 ──
   customMusicUrl: '',              // 自定义音乐链接（推荐，最可靠）
@@ -2505,35 +2527,33 @@ const LOVE_CONFIG = {
 
   // ── 时间轴（按时间顺序，可以增删改） ──
   timeline: [
-    { date: '2024.07',     title: '💕 初次相遇',  desc: '那个夏天，我们第一次遇见了彼此。从此，世界变得不一样了。' },
-    { date: '2024.08',     title: '🌹 第一次约会', desc: '还记得那天你穿的裙子，还记得我紧张到说不出话。' },
-    { date: '2024.09',     title: '💗 正式在一起', desc: '从那天起，你就是我的全世界。' },
-    { date: '2024.12',     title: '✈️ 第一次旅行', desc: '一起看过的风景，每一帧都是最美的回忆。' },
-    { date: '2025.02',     title: '🎉 第一个情人节', desc: '玫瑰、巧克力，还有你甜过一切的笑容。' },
-    { date: '2025.07',     title: '🎂 一周年纪念', desc: '365天的甜蜜，只是我们故事的开始。' },
-    { date: '2026.06.13',  title: '🌟 创建纪念网站', desc: '今天，我们为彼此建立了这个专属纪念网站。记录我们的过去，期待我们的未来。' },
+    { date: '2024.07',     title: '💕 写下你们的第一个瞬间',  desc: '在这里记录属于你们的故事...' },
+    { date: '2024.08',     title: '🌹 标记一个特别的日子',  desc: '这一天发生了什么让你心动的事？' },
+    { date: '2024.09',     title: '💗 属于你们的纪念日',  desc: '说好在一起的那一天，还记得吗？' },
+    { date: '2025.02',     title: '🎉 浪漫的节日',      desc: '一起度过的节日，一定有特别的回忆...' },
+    { date: '2025.07',     title: '🎂 周年快乐',        desc: '这一年，你们一起经历了哪些美好？' },
   ],
 
   // ── 个人档案 ──
   boy: {
-    emoji: '🦊', role: '专属男友 / 首席陪伴官',
+    emoji: '🦊', role: '他的角色（由你来写～）',
     tags: ['温柔体贴', '会做饭', '爱拍照', '摩羯座'],
-    bio: '在这里写下关于他的介绍，让世界知道你眼中的他有多特别...'
+    bio: '用你的文字介绍他，让世界看到他在你眼里的样子...'
   },
   girl: {
-    emoji: '🐰', role: '专属女友 / 终身可爱担当',
+    emoji: '🐰', role: '她的角色（由你来写～）',
     tags: ['可爱撒娇', '爱画画', '小洁癖', '天蝎座'],
-    bio: '在这里写下关于她的介绍，用文字画出她最美的样子...'
+    bio: '用你的文字介绍她，画出心中最美的模样...'
   },
 
-  // ── 相册（修改标题和描述，点击图片可上传） ──
+  // ── 相册（修改标题和描述，可传图片链接或点击卡片上传） ──
   album: [
-    { title: '初次相遇',    desc: '我们的第一张合照',   emoji: '💕', color1: '#f0d0da', color2: '#e0c8e0' },
-    { title: '甜蜜约会',    desc: '一起度过的美好时光', emoji: '🌹', color1: '#f5d5e0', color2: '#e8d8f0' },
-    { title: '旅行记忆',    desc: '一起去过的地方',     emoji: '✈️', color1: '#d0d8f0', color2: '#f0d8e0' },
-    { title: '节日庆祝',    desc: '每一个特别的日子',   emoji: '🎄', color1: '#c8d8c8', color2: '#f0d0d0' },
-    { title: '日常甜蜜',    desc: '平凡中的小幸福',     emoji: '🌸', color1: '#f5d5e0', color2: '#e8d8f0' },
-    { title: '未来可期',    desc: '更多美好在等着我们', emoji: '🌟', color1: '#f0e0e8', color2: '#e0e0f0' },
+    { title: '初次相遇',    desc: '我们的第一张合照',   emoji: '💕', imgUrl: '', color1: '#f0d0da', color2: '#e0c8e0' },
+    { title: '甜蜜约会',    desc: '一起度过的美好时光', emoji: '🌹', imgUrl: '', color1: '#f5d5e0', color2: '#e8d8f0' },
+    { title: '旅行记忆',    desc: '一起去过的地方',     emoji: '✈️', imgUrl: '', color1: '#d0d8f0', color2: '#f0d8e0' },
+    { title: '节日庆祝',    desc: '每一个特别的日子',   emoji: '🎄', imgUrl: '', color1: '#c8d8c8', color2: '#f0d0d0' },
+    { title: '日常甜蜜',    desc: '平凡中的小幸福',     emoji: '🌸', imgUrl: '', color1: '#f5d5e0', color2: '#e8d8f0' },
+    { title: '未来可期',    desc: '更多美好在等着我们', emoji: '🌟', imgUrl: '', color1: '#f0e0e8', color2: '#e0e0f0' },
   ],
 
   // ── 合照轮播 ──
@@ -2546,16 +2566,16 @@ const LOVE_CONFIG = {
 
   // ── 日记 ──
   diary: [
-    { date: '2026.06.13', weather: '☀️', title: '我们有了专属网站', excerpt: '今天我们一起创建了这个专属恋爱纪念空间，以后我们的每一个甜蜜瞬间，都会在这里被好好珍藏。', mood: '💗💗💗💗💗' },
-    { date: '待填写', weather: '🌤️', title: '在这里写日记标题', excerpt: '点击这里修改日记内容，记录你们每天的甜蜜时刻...', mood: '💗💗💗' },
-    { date: '待填写', weather: '🌧️', title: '在这里写日记标题', excerpt: '点击这里修改日记内容，就算是下雨天，有你在也是晴天...', mood: '💗💗💗' },
-    { date: '待填写', weather: '☀️', title: '在这里写日记标题', excerpt: '点击这里修改日记内容，每一天都值得被记录...', mood: '💗💗💗💗' },
+    { date: '2026.06.13', weather: '☀️', title: '写一篇日记吧', excerpt: '今天有什么开心的事？在这里记录下来吧～', mood: '💗💗💗💗💗' },
+    { date: '待填写', weather: '🌤️', title: '在这里写日记标题', excerpt: '把每天的甜蜜写在这里，以后回头看看一定很幸福...', mood: '💗💗💗' },
+    { date: '待填写', weather: '🌧️', title: '在这里写日记标题', excerpt: '不管晴天雨天，有你在的每一天都值得纪念...', mood: '💗💗💗' },
+    { date: '待填写', weather: '☀️', title: '在这里写日记标题', excerpt: '今天的小确幸，由你来书写...', mood: '💗💗💗💗' },
   ],
 
   // ── 留言板初始留言 ──
   messages: [
-    { author: '王志德', text: '遇见你，是我这辈子最幸运的事。余生漫长，只想和你一起走。', hearts: '♥ ♡ ♥' },
-    { author: '杨秋燕', text: '谢谢你来到我的世界，让每一天都变得闪闪发光。', hearts: '♡ ♥ ♡' },
+    { author: '王志德', text: '这里写下你想对她说的话...', hearts: '♥ ♡ ♥' },
+    { author: '杨秋燕', text: '这里写下你想对他说的话...', hearts: '♡ ♥ ♡' },
   ]
 };
 
@@ -2740,9 +2760,20 @@ function uploadImage(key, loadingEl, successCallback) {
 }
 
 function applyStoredImage(element, key) {
-  const images = loadStoredImages();
+  var images = loadStoredImages();
+  // 优先：localStorage 上传的图片
   if (images[key]) {
-    element.style.backgroundImage = `url(${images[key]})`;
+    element.style.backgroundImage = 'url(' + images[key] + ')';
+    element.style.backgroundSize = 'cover';
+    element.style.backgroundPosition = 'center';
+    element.classList.add('has-image');
+    return true;
+  }
+  // 其次：配置中的在线图片链接（双方都能看到）
+  var idx = parseInt(key.replace('album_', ''));
+  var album = (LOVE_CONFIG && LOVE_CONFIG.album) || [];
+  if (album[idx] && album[idx].imgUrl) {
+    element.style.backgroundImage = 'url(' + album[idx].imgUrl + ')';
     element.style.backgroundSize = 'cover';
     element.style.backgroundPosition = 'center';
     element.classList.add('has-image');
@@ -2998,205 +3029,103 @@ function showGlobalToast(text) {
   setTimeout(() => toast.classList.remove('show'), 2500);
 }
 
-// ═══════════════════════════════════════
-//  音乐系统：三层 fallback
-//  1. 用户自定义链接 → 2. 网易云直链 → 3. Web Audio 钢琴生成
-// ═══════════════════════════════════════
-
-// Web Audio API 生成轻柔钢琴旋律（最终 fallback）
+// ═══════════════ 音乐系统：URL → Web Audio 钢琴 ═══════════════
 function _startWebAudioMusic() {
-  if (window._webAudioCtx) return window._webAudioCtx;
-  try {
-    var AudioCtx = window.AudioContext || window.webkitAudioContext;
-    var ctx = new AudioCtx();
-    window._webAudioCtx = ctx;
-
-    // 轻柔的钢琴音符序列（C大调）
-    var melody = [
-      { note: 523.25, dur: 1.0 },  // C5
-      { note: 587.33, dur: 0.5 },  // D5
-      { note: 659.25, dur: 0.5 },  // E5
-      { note: 523.25, dur: 1.5 },  // C5
-      { note: 493.88, dur: 0.5 },  // B4
-      { note: 523.25, dur: 2.0 },  // C5
-      { note: 0,      dur: 0.5 },  // 休止
-      { note: 392.00, dur: 1.0 },  // G4
-      { note: 440.00, dur: 0.5 },  // A4
-      { note: 493.88, dur: 0.5 },  // B4
-      { note: 523.25, dur: 2.0 },  // C5
-      { note: 0,      dur: 0.5 },  // 休止
-      { note: 659.25, dur: 0.5 },  // E5
-      { note: 587.33, dur: 0.5 },  // D5
-      { note: 523.25, dur: 0.5 },  // C5
-      { note: 493.88, dur: 1.5 },  // B4
-      { note: 523.25, dur: 3.0 },  // C5 (延长)
-    ];
-
-    var gainNode = ctx.createGain();
-    gainNode.gain.value = 0.15; // 轻柔音量
-    gainNode.connect(ctx.destination);
-    window._webAudioGain = gainNode;
-
-    var noteIdx = 0;
-    function playNext() {
-      if (!window._webAudioRunning) return;
-      var m = melody[noteIdx % melody.length];
-      noteIdx++;
-      if (m.note > 0) {
-        var osc = ctx.createOscillator();
-        var env = ctx.createGain();
-        osc.type = 'sine';
-        osc.frequency.value = m.note;
-        env.gain.setValueAtTime(0, ctx.currentTime);
-        env.gain.linearRampToValueAtTime(1, ctx.currentTime + 0.08);
-        env.gain.linearRampToValueAtTime(0.3, ctx.currentTime + m.dur * 0.7);
-        env.gain.linearRampToValueAtTime(0, ctx.currentTime + m.dur);
-        osc.connect(env);
-        env.connect(gainNode);
-        osc.start(ctx.currentTime);
-        osc.stop(ctx.currentTime + m.dur + 0.1);
-      }
-      window._webAudioTimer = setTimeout(playNext, m.dur * 1000 * 0.95);
+  if (window._webAudioCtx && window._webAudioRunning) return;
+  if (window._webAudioCtx) {
+    if (window._webAudioCtx.state === 'suspended') {
+      window._webAudioCtx.resume().then(function() {
+        window._webAudioRunning = true;
+        _playMelody(window._webAudioCtx);
+      });
     }
-    playNext();
-    window._webAudioRunning = true;
-    return ctx;
-  } catch(e) {
-    return null;
+    return;
   }
+  try {
+    var ctx = new (window.AudioContext || window.webkitAudioContext)();
+    window._webAudioCtx = ctx;
+    ctx.resume().then(function() {
+      window._webAudioRunning = true;
+      _playMelody(ctx);
+    }).catch(function() { window._webAudioCtx = null; });
+  } catch(e) { window._webAudioCtx = null; }
+}
+
+function _playMelody(ctx) {
+  var n = [523.25,587.33,659.25,523.25,493.88,523.25,0,392.00,440.00,493.88,523.25,0,659.25,587.33,523.25,493.88,523.25];
+  var d = [1.0,0.5,0.5,1.5,0.5,2.0,0.5,1.0,0.5,0.5,2.0,0.5,0.5,0.5,0.5,1.5,3.0];
+  var g = ctx.createGain(); g.gain.value = 0.12; g.connect(ctx.destination);
+  var i = 0;
+  function next() {
+    if (!window._webAudioRunning) return;
+    if (n[i%n.length] > 0) {
+      var o = ctx.createOscillator(), e = ctx.createGain();
+      o.type = 'sine'; o.frequency.value = n[i%n.length];
+      var t = ctx.currentTime;
+      e.gain.setValueAtTime(0,t); e.gain.linearRampToValueAtTime(0.6,t+0.06);
+      e.gain.setValueAtTime(0.6,t+d[i%d.length]*0.6); e.gain.linearRampToValueAtTime(0,t+d[i%d.length]);
+      o.connect(e); e.connect(g); o.start(t); o.stop(t+d[i%d.length]+0.1);
+    }
+    i++; window._webAudioTimer = setTimeout(next, d[(i-1)%d.length]*950);
+  }
+  next();
 }
 
 function _stopWebAudioMusic() {
   window._webAudioRunning = false;
   if (window._webAudioTimer) clearTimeout(window._webAudioTimer);
-  if (window._webAudioCtx) {
-    try { window._webAudioCtx.close(); } catch(e) {}
-    window._webAudioCtx = null;
-  }
+  if (window._webAudioCtx) { try { window._webAudioCtx.close(); } catch(e) {} window._webAudioCtx = null; }
 }
 
-// 全局音乐初始化 — 三层 fallback
 function initMusic() {
   if (window._musicAudio || window._webAudioCtx) return;
-
   var box = document.getElementById('musicBox');
+  var old = box.querySelector('iframe,audio'); if (old) old.remove();
 
-  // 清理旧的
-  var oldIframe = document.getElementById('neteaseIframe');
-  if (oldIframe) oldIframe.remove();
-  var oldAudio = document.getElementById('neteaseAudio');
-  if (oldAudio) oldAudio.remove();
+  var customUrl = '', songId = '7564127027';
+  try { var cc = JSON.parse(localStorage.getItem('love_custom_config')||'{}');
+    customUrl = cc.customMusicUrl || ''; songId = cc.neteaseSongId || songId; } catch(e) {}
 
-  // 读取配置
-  var customUrl = '';
-  var songId = '7564127027';
-  try {
-    var cc = JSON.parse(localStorage.getItem('love_custom_config') || '{}');
-    customUrl = cc.customMusicUrl || (LOVE_CONFIG && LOVE_CONFIG.customMusicUrl) || '';
-    songId = cc.neteaseSongId || (LOVE_CONFIG && LOVE_CONFIG.neteaseSongId) || songId;
-  } catch(e) {}
-  if (!customUrl && LOVE_CONFIG && LOVE_CONFIG.customMusicUrl) customUrl = LOVE_CONFIG.customMusicUrl;
-  if (!songId && LOVE_CONFIG && LOVE_CONFIG.neteaseSongId) songId = LOVE_CONFIG.neteaseSongId;
-
-  // 添加可视化播放状态
-  function showMusicStatus(msg, sub) {
-    var status = document.getElementById('musicStatus');
-    if (!status) {
-      status = document.createElement('div');
-      status.className = 'music-status';
-      status.id = 'musicStatus';
-      box.appendChild(status);
-    }
-    status.innerHTML = '<div class="music-wave"><span></span><span></span><span></span><span></span><span></span></div><div class="music-info">' + msg + (sub ? '<div><small>' + sub + '</small></div>' : '') + '</div>';
+  function showStatus(msg, sub) {
+    var s = document.getElementById('musicStatus');
+    if (!s) { s = document.createElement('div'); s.className = 'music-status'; s.id = 'musicStatus'; box.appendChild(s); }
+    s.innerHTML = '<div class="music-wave"><span></span><span></span><span></span><span></span><span></span></div><div class="music-info">' + msg + (sub ? '<div><small>' + sub + '</small></div>' : '') + '</div>';
   }
 
-  // 尝试用 HTML5 Audio 播放
-  function tryPlayAudio(src, onDone) {
-    var audio = document.createElement('audio');
-    audio.id = 'neteaseAudio';
-    audio.loop = true;
-    audio.volume = 0.5;
-    audio.preload = 'auto';
-    audio.crossOrigin = 'anonymous';
-    audio.src = src;
+  box.innerHTML = ''; box.classList.add('show'); showStatus('♫ 正在连接...', '尝试加载音乐');
 
-    var resolved = false;
-    audio.addEventListener('canplaythrough', function() {
-      if (resolved) return;
-      resolved = true;
-      audio.play().then(function() {
-        window._musicAudio = audio;
-        document.getElementById('musicToggleBtn').textContent = '🎵';
-        showMusicStatus('♫ 正在播放', '点击按钮切换暂停');
-        showGlobalToast('🎵 音乐已开启 ♫');
-      }).catch(function() {
-        showGlobalToast('🎵 请点击右下角音乐按钮开始播放');
-        window._musicAudio = audio;
-        document.getElementById('musicToggleBtn').textContent = '🎵';
-        showMusicStatus('♫ 已就绪', '点击按钮开始播放');
-      });
-    });
-    audio.addEventListener('play', function() {
-      document.getElementById('musicToggleBtn').textContent = '🎵';
-    });
-    audio.addEventListener('pause', function() {
-      document.getElementById('musicToggleBtn').textContent = '🔇';
-    });
-    audio.addEventListener('error', function() {
-      if (resolved) return;
-      resolved = true;
-      audio.remove();
-      if (onDone) onDone();
-    });
-    // 超时检测
-    setTimeout(function() {
-      if (!resolved) {
-        resolved = true;
-        audio.remove();
-        if (onDone) onDone();
-      }
-    }, 5000);
+  var urls = [];
+  if (customUrl && customUrl.trim()) urls.push(customUrl.trim());
+  urls.push('https://music.163.com/song/media/outer/url?id=' + songId + '.mp3');
 
-    box.innerHTML = '';
-    showMusicStatus('♫ 加载中...', '正在连接音乐源');
-    box.appendChild(audio);
-    box.classList.add('show');
-
-    // 尝试播放
-    audio.play().catch(function(){});
-  }
-
-  // 三层尝试
-  box.innerHTML = '';
-  box.classList.add('show');
-
-  // 第1层：用户自定义链接
-  if (customUrl && customUrl.trim()) {
-    tryPlayAudio(customUrl.trim(), function() {
-      // 第2层：网易云直链
-      tryPlayAudio('https://music.163.com/song/media/outer/url?id=' + songId + '.mp3', function() {
-        // 尝试备选网易云歌曲
-        tryPlayAudio('https://music.163.com/song/media/outer/url?id=186331.mp3', function() {
-          // 第3层：Web Audio API 生成钢琴旋律
-          showMusicStatus('🎹 内置钢琴旋律', '已生成背景音乐');
-          _startWebAudioMusic();
-          document.getElementById('musicToggleBtn').textContent = '🎵';
-          showGlobalToast('🎹 正在播放内置钢琴旋律');
-        });
-      });
-    });
-    return;
-  }
-
-  // 没有自定义链接，直接网易云
-  tryPlayAudio('https://music.163.com/song/media/outer/url?id=' + songId + '.mp3', function() {
-    tryPlayAudio('https://music.163.com/song/media/outer/url?id=186331.mp3', function() {
-      showMusicStatus('🎹 内置钢琴旋律', '已生成背景音乐');
+  var tryIdx = 0;
+  function tryNext() {
+    if (tryIdx >= urls.length) {
+      showStatus('🎹 钢琴旋律', '已为你生成背景音乐');
       _startWebAudioMusic();
-      document.getElementById('musicToggleBtn').textContent = '🎵';
+      var btn = document.getElementById('musicToggleBtn'); if (btn) btn.textContent = '🎵';
       showGlobalToast('🎹 正在播放内置钢琴旋律');
-    });
-  });
+      return;
+    }
+    var src = urls[tryIdx]; tryIdx++;
+    var a = new Audio(); a.loop = true; a.volume = 0.5; a.crossOrigin = 'anonymous'; a.preload = 'auto';
+    var done = false;
+    function resolve(ok) {
+      if (done) return; done = true;
+      if (!ok) { a.src = ''; a.remove(); tryNext(); return; }
+      window._musicAudio = a;
+      var btn = document.getElementById('musicToggleBtn'); if (btn) btn.textContent = '🎵';
+      showStatus('♫ 正在播放', '点击按钮切换暂停'); showGlobalToast('🎵 音乐已开启 ♫');
+    }
+    a.addEventListener('canplay', function() { a.play().then(function() { resolve(true); }).catch(function() { resolve(false); }); });
+    a.addEventListener('error', function() { resolve(false); });
+    a.addEventListener('play', function() { var btn = document.getElementById('musicToggleBtn'); if (btn) btn.textContent = '🎵'; });
+    a.addEventListener('pause', function() { var btn = document.getElementById('musicToggleBtn'); if (btn) btn.textContent = '🔇'; });
+    setTimeout(function() { if (!done) resolve(false); }, 6000);
+    a.src = src; a.load();
+    setTimeout(function() { if (!done) a.play().catch(function(){}); }, 300);
+  }
+  tryNext();
 }
 
 /* ───────── Login System ───────── */
@@ -3241,7 +3170,7 @@ function initMusic() {
         }, 100);
       }
     } else {
-      error.textContent = '密码不正确哦~ 请输入 ta 的出生年月日（如：20060108 或 20061105）';
+      error.textContent = '密码不正确哦~ 请输入 ta 的出生年月日（如：20060108 或 200601105）';
       card.classList.add('shake');
       setTimeout(() => card.classList.remove('shake'), 500);
       input.value = '';
@@ -3528,41 +3457,18 @@ let scrollObserver;
 /* ───────── Music Player ───────── */
 (function() {
   var btn = document.getElementById('musicToggleBtn');
-
   btn.addEventListener('click', function() {
-    // 没有任何音乐源，初始化
-    if (!window._musicAudio && !window._webAudioCtx) {
-      initMusic();
-      showGlobalToast('🎵 音乐已开启 ♫');
-      return;
-    }
+    if (!window._musicAudio && !window._webAudioCtx) { initMusic(); showGlobalToast('🎵 音乐已开启 ♫'); return; }
     // Web Audio 模式
     if (window._webAudioCtx && !window._musicAudio) {
-      if (window._webAudioRunning) {
-        _stopWebAudioMusic();
-        btn.textContent = '🔇';
-        showGlobalToast('🔇 音乐已暂停');
-      } else {
-        _startWebAudioMusic();
-        btn.textContent = '🎵';
-        showGlobalToast('🎹 钢琴旋律已恢复');
-      }
+      if (window._webAudioRunning) { _stopWebAudioMusic(); btn.textContent = '🔇'; showGlobalToast('🔇 音乐已暂停'); }
+      else { _startWebAudioMusic(); btn.textContent = '🎵'; showGlobalToast('🎹 钢琴旋律已恢复'); }
       return;
     }
-    // HTML5 Audio 模式
-    var audio = window._musicAudio;
-    if (audio && audio.paused) {
-      audio.play().then(function() {
-        btn.textContent = '🎵';
-        showGlobalToast('🎵 音乐已开启');
-      }).catch(function() {
-        showGlobalToast('⚠️ 播放失败，请重试');
-      });
-    } else if (audio) {
-      audio.pause();
-      btn.textContent = '🔇';
-      showGlobalToast('🔇 音乐已暂停');
-    }
+    // Audio 模式
+    var a = window._musicAudio;
+    if (a && a.paused) { a.play().then(function(){ btn.textContent = '🎵'; showGlobalToast('🎵 音乐已开启'); }).catch(function(){ showGlobalToast('⚠️ 播放失败，请重试'); }); }
+    else if (a) { a.pause(); btn.textContent = '🔇'; showGlobalToast('🔇 音乐已暂停'); }
   });
 })();
 
@@ -3599,23 +3505,17 @@ document.addEventListener('DOMContentLoaded', () => {
 <!-- ═════════════ 修复脚本：音乐 + 自定义编辑 ═════════════ -->
 <script>
 /* ═══════════════════════════════════════════════════════════════
-   🔧 修复1：音乐系统 — 三层fallback (自定义URL → 网易云 → Web Audio)
+   🔧 音乐 fallback：已有实例则恢复，否则走完整初始化
    ═══════════════════════════════════════════════════════════════ */
 window.initMusic = function() {
-  // 如果已有音频在播放，恢复它
   if (window._musicAudio) {
-    if (window._musicAudio.paused) {
-      window._musicAudio.play().catch(function(){});
-    }
+    if (window._musicAudio.paused) window._musicAudio.play().catch(function(){});
     return;
   }
-  // 如果 Web Audio 在运行，恢复
-  if (window._webAudioCtx && window._webAudioRunning) return;
-  if (window._webAudioCtx && !window._webAudioRunning) {
-    _startWebAudioMusic();
+  if (window._webAudioCtx) {
+    if (!window._webAudioRunning) _startWebAudioMusic();
     return;
   }
-  // 否则走完整初始化
   initMusic();
 };
 
@@ -3716,8 +3616,8 @@ function populateEditPanel() {
   safeSetValue('editGirlPw', lc('girlPassword', LOVE_CONFIG.girlPassword));
   safeSetValue('editHeroSubtitle', cfg.heroSubtitle || '');
   safeSetValue('editHeroDate', cfg.heroDate || '');
-  safeSetValue('editSongId', cfg.neteaseSongId || LOVE_CONFIG.neteaseSongId || '');
   safeSetValue('editMusicUrl', cfg.customMusicUrl || LOVE_CONFIG.customMusicUrl || '');
+  safeSetValue('editSongId', cfg.neteaseSongId || LOVE_CONFIG.neteaseSongId || '');
   safeSetValue('editBoyEmoji', (cfg.boy && cfg.boy.emoji) || LOVE_CONFIG.boy.emoji);
   safeSetValue('editBoyRole', (cfg.boy && cfg.boy.role) || LOVE_CONFIG.boy.role);
   safeSetValue('editBoyTags', (cfg.boy && cfg.boy.tags) ? cfg.boy.tags.join(',') : LOVE_CONFIG.boy.tags.join(','));
@@ -3829,6 +3729,7 @@ function renderAlbumEdit() {
       '<label>相册 ' + (i+1) + '</label>' +
       '<input type="text" value="' + escAttr(item.title) + '" placeholder="标题" data-idx="' + i + '" data-field="title" class="album-input">' +
       '<input type="text" value="' + escAttr(item.desc) + '" placeholder="描述" data-idx="' + i + '" data-field="desc" class="album-input" style="margin-top:4px;">' +
+      '<input type="text" value="' + escAttr(item.imgUrl||'') + '" placeholder="🌐 在线图片链接（双方可见）" data-idx="' + i + '" data-field="imgUrl" class="album-input" style="margin-top:4px;">' +
       '<input type="text" value="' + escAttr(item.emoji) + '" placeholder="Emoji" data-idx="' + i + '" data-field="emoji" class="album-input" style="margin-top:4px;width:80px;">' +
       '</div>';
   }).join('');
@@ -3922,10 +3823,11 @@ function readDynamicList(type) {
     if (type === 'album') {
       var titles = document.querySelectorAll('#editAlbumList .album-input[data-field="title"]');
       var descs = document.querySelectorAll('#editAlbumList .album-input[data-field="desc"]');
+      var imgUrls = document.querySelectorAll('#editAlbumList .album-input[data-field="imgUrl"]');
       var emojis = document.querySelectorAll('#editAlbumList .album-input[data-field="emoji"]');
       var result = [];
       for (var i = 0; i < titles.length; i++) {
-        result.push({ title: titles[i].value, desc: descs[i].value, emoji: emojis[i].value, color1: '#f0d0da', color2: '#e0c8e0' });
+        result.push({ title: titles[i].value, desc: descs[i].value, imgUrl: imgUrls[i].value, emoji: emojis[i].value, color1: '#f0d0da', color2: '#e0c8e0' });
       }
       return result;
     }
@@ -3958,6 +3860,34 @@ function readDynamicList(type) {
       setTimeout(function() { location.reload(); }, 1200);
     }
   });
+  // 导出配置
+  var exportBtn = document.getElementById('editExportBtn');
+  if (exportBtn) exportBtn.addEventListener('click', function() {
+    var data = {};
+    try { data = JSON.parse(localStorage.getItem('love_custom_config') || '{}'); } catch(e) {}
+    var blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    var a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'love_config_backup.json'; a.click();
+    showGlobalToast('📤 配置文件已下载！发给对方即可导入');
+  });
+  // 导入配置
+  var importBtn = document.getElementById('editImportBtn');
+  if (importBtn) importBtn.addEventListener('click', function() {
+    var input = document.createElement('input'); input.type = 'file'; input.accept = '.json';
+    input.onchange = function() {
+      var file = input.files[0]; if (!file) return;
+      var reader = new FileReader();
+      reader.onload = function() {
+        try {
+          var data = JSON.parse(reader.result);
+          localStorage.setItem('love_custom_config', JSON.stringify(data));
+          showGlobalToast('📥 配置已导入！页面即将刷新...');
+          setTimeout(function() { location.reload(); }, 1200);
+        } catch(e) { showGlobalToast('⚠️ 导入失败，请检查文件格式'); }
+      };
+      reader.readAsText(file);
+    };
+    input.click();
+  });
   var toggleBtn = document.getElementById('editModeToggle');
   if (toggleBtn) toggleBtn.addEventListener('click', function() {
     openEditPanel();
@@ -3969,16 +3899,8 @@ function readDynamicList(type) {
   // 音乐测试按钮
   var testBtn = document.getElementById('testMusicBtn');
   if (testBtn) testBtn.addEventListener('click', function() {
-    // 停止当前所有音乐
-    if (window._musicAudio) {
-      window._musicAudio.pause();
-      window._musicAudio.src = '';
-      window._musicAudio = null;
-    }
-    if (window._webAudioCtx) {
-      _stopWebAudioMusic();
-    }
-    // 读取当前编辑面板的配置并重新初始化
+    _stopWebAudioMusic();
+    if (window._musicAudio) { window._musicAudio.pause(); window._musicAudio.src = ''; window._musicAudio = null; }
     var customUrl = document.getElementById('editMusicUrl').value.trim();
     var songId = document.getElementById('editSongId').value.trim();
     if (!customUrl && !songId) { showGlobalToast('⚠️ 请填写音乐链接或歌曲ID'); return; }
@@ -3987,12 +3909,6 @@ function readDynamicList(type) {
     initMusic();
     showGlobalToast('🔊 正在测试播放...');
   });
-  // 移除旧的自动提取逻辑（editMusicUrl 现在用于自定义MP3链接）
-  var urlInput = document.getElementById('editMusicUrl');
-  if (urlInput) {
-    // 清除旧的事件监听器（无法直接移除匿名函数，但这个已经不需要了）
-    urlInput.removeEventListener('input', function(){});
-  }
 })();
 
 /* ═══════════════════════════════════════════════════════════════
