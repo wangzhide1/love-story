@@ -2506,7 +2506,7 @@ input, textarea, select {
   <div class="music-player-box" id="musicBox">
     <!-- iframe 将在用户手势后动态创建，首次显示时追加 show 类 -->
   </div>
-  <span class="music-hint">♫ 网易云音乐</span>
+  <span class="music-hint">♫ 背景音乐</span>
   <button class="music-toggle-btn" id="musicToggleBtn" aria-label="音乐控件">🎵</button>
 </div>
 
@@ -2528,11 +2528,6 @@ const LOVE_CONFIG = {
   startDate: '2024-07-01',        // 相识日期（YYYY-MM-DD）
   boyPassword: '20060108',        // 男方密码（出生年月日）
   girlPassword: '200601105',      // 女方密码（出生年月日）
-
-  // ── 音乐 ──
-  customMusicUrl: '',              // 自定义音乐链接（推荐，最可靠）
-  neteasePlaylistId: '3778678',   // 网易云歌单ID（优先于单曲）
-  neteaseSongId: '7564127027',    // 网易云歌曲ID（备选）
 
   // ── 时间轴（按时间顺序，可以增删改） ──
   timeline: [
@@ -3479,9 +3474,6 @@ function loadCustomConfig() {
   if (cfg.startDate !== undefined) LOVE_CONFIG.startDate = cfg.startDate;
   if (cfg.boyPassword !== undefined) LOVE_CONFIG.boyPassword = cfg.boyPassword;
   if (cfg.girlPassword !== undefined) LOVE_CONFIG.girlPassword = cfg.girlPassword;
-  if (cfg.customMusicUrl !== undefined) LOVE_CONFIG.customMusicUrl = cfg.customMusicUrl;
-  if (cfg.neteasePlaylistId !== undefined) LOVE_CONFIG.neteasePlaylistId = cfg.neteasePlaylistId;
-  if (cfg.neteaseSongId !== undefined) LOVE_CONFIG.neteaseSongId = cfg.neteaseSongId;
   if (cfg.heroSubtitle !== undefined) {
     var els = document.querySelectorAll('.hero-subtitle');
     for (var i = 0; i < els.length; i++) els[i].textContent = cfg.heroSubtitle;
@@ -3561,9 +3553,6 @@ function populateEditPanel() {
   safeSetValue('editGirlPw', lc('girlPassword', LOVE_CONFIG.girlPassword));
   safeSetValue('editHeroSubtitle', cfg.heroSubtitle || '');
   safeSetValue('editHeroDate', cfg.heroDate || '');
-  safeSetValue('editMusicUrl', cfg.customMusicUrl || LOVE_CONFIG.customMusicUrl || '');
-  safeSetValue('editPlaylistId', cfg.neteasePlaylistId || LOVE_CONFIG.neteasePlaylistId || '');
-  safeSetValue('editSongId', cfg.neteaseSongId || LOVE_CONFIG.neteaseSongId || '');
   safeSetValue('editBoyEmoji', (cfg.boy && cfg.boy.emoji) || LOVE_CONFIG.boy.emoji);
   safeSetValue('editBoyRole', (cfg.boy && cfg.boy.role) || LOVE_CONFIG.boy.role);
   safeSetValue('editBoyTags', (cfg.boy && cfg.boy.tags) ? cfg.boy.tags.join(',') : LOVE_CONFIG.boy.tags.join(','));
@@ -3707,9 +3696,6 @@ function saveEditPanel() {
   cfg.girlPassword = document.getElementById('editGirlPw').value;
   cfg.heroSubtitle = document.getElementById('editHeroSubtitle').value;
   cfg.heroDate = document.getElementById('editHeroDate').value;
-  cfg.customMusicUrl = document.getElementById('editMusicUrl').value;
-  cfg.neteasePlaylistId = document.getElementById('editPlaylistId').value;
-  cfg.neteaseSongId = document.getElementById('editSongId').value;
   // 个人档案
   cfg.boy = cfg.boy || {};
   cfg.boy.emoji = document.getElementById('editBoyEmoji').value;
