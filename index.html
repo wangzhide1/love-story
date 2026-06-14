@@ -1498,6 +1498,11 @@ body {
   height: 90px;
   background: transparent;
 }
+/* 歌单 iframe 需要更高 */
+.music-player-box iframe#playlistIframe {
+  width: clamp(260px, 32vw, 360px);
+  height: 450px;
+}
 /* audio 可视化播放状态条 */
 .music-player-box .music-status {
   display: flex;
@@ -2038,6 +2043,7 @@ textarea:focus-visible {
   .music-container { bottom: 16px; right: 16px; }
   .music-player-box iframe,
   .music-player-box audio { width: 240px; height: 86px; }
+  .music-player-box iframe#playlistIframe { width: 260px; height: 400px; }
   .music-hint { bottom: 70px; right: 16px; font-size: 0.68rem; }
   .back-to-top { bottom: 76px; right: 16px; width: 40px; height: 40px; }
   .lightbox-nav { width: 40px; height: 40px; font-size: 1.2rem; }
@@ -2073,6 +2079,7 @@ textarea:focus-visible {
   .nav-links.open { top: 56px; }
   .music-player-box iframe,
   .music-player-box audio { width: 200px; height: 86px; }
+  .music-player-box iframe#playlistIframe { width: 240px; height: 360px; }
   .music-container { bottom: 10px; right: 10px; }
   .music-toggle-btn { width: 42px; height: 42px; font-size: 1.1rem; }
   .music-hint { bottom: 62px; right: 10px; }
@@ -2456,14 +2463,19 @@ input, textarea, select {
       <!-- Tab: music -->
       <div class="edit-panel-tab-content" data-tab="music">
         <div class="edit-field">
-          <label>🎵 自定义音乐链接（推荐）</label>
-          <input type="text" id="editMusicUrl" placeholder="粘贴任意 MP3 直链地址" maxlength="500">
-          <span class="hint">最可靠的方案！上传 MP3 到 GitHub 仓库后填写相对路径，如 ./lovemusic.mp3</span>
+          <label>🎧 网易云歌单 ID（优先）</label>
+          <input type="text" id="editPlaylistId" maxlength="20" inputmode="numeric" placeholder="如 3778678">
+          <span class="hint">打开歌单页，URL 中的 id= 后面的数字即为歌单 ID。填了歌单就优先用歌单。</span>
         </div>
         <div class="edit-field">
-          <label>🎶 备选：网易云音乐歌曲 ID</label>
+          <label>🎵 自定义音乐链接</label>
+          <input type="text" id="editMusicUrl" placeholder="粘贴任意 MP3 直链地址" maxlength="500">
+          <span class="hint">上传 MP3 到 GitHub 仓库后填写相对路径，如 ./lovemusic.mp3</span>
+        </div>
+        <div class="edit-field">
+          <label>🎶 备选：网易云单曲 ID</label>
           <input type="text" id="editSongId" maxlength="20" inputmode="numeric" placeholder="如 7564127027">
-          <span class="hint">打开歌曲页，URL 中的数字即为歌曲 ID。</span>
+          <span class="hint">歌单链接和自定义链接为空时使用。</span>
         </div>
         <div class="edit-field">
           <label>音乐测试</label>
@@ -2523,7 +2535,8 @@ const LOVE_CONFIG = {
 
   // ── 音乐 ──
   customMusicUrl: '',              // 自定义音乐链接（推荐，最可靠）
-  neteaseSongId: '7564127027',    // 网易云音乐歌曲ID（备选）
+  neteasePlaylistId: '3778678',   // 网易云歌单ID（优先于单曲）
+  neteaseSongId: '7564127027',    // 网易云歌曲ID（备选）
 
   // ── 时间轴（按时间顺序，可以增删改） ──
   timeline: [
@@ -3080,11 +3093,12 @@ function _stopWebAudioMusic() {
 function initMusic() {
   if (window._musicAudio || window._webAudioCtx) return;
   var box = document.getElementById('musicBox');
-  var old = box.querySelector('iframe,audio'); if (old) old.remove();
+  var old = box.querySelector('iframe,audio,div.music-status'); if (old) { box.innerHTML = ''; }
 
-  var customUrl = '', songId = '7564127027';
+  var customUrl = '', songId = '7564127027', playlistId = '';
   try { var cc = JSON.parse(localStorage.getItem('love_custom_config')||'{}');
-    customUrl = cc.customMusicUrl || ''; songId = cc.neteaseSongId || songId; } catch(e) {}
+    customUrl = cc.customMusicUrl || ''; songId = cc.neteaseSongId || songId;
+    playlistId = cc.neteasePlaylistId || (LOVE_CONFIG.neteasePlaylistId || ''); } catch(e) {}
 
   function showStatus(msg, sub) {
     var s = document.getElementById('musicStatus');
@@ -3092,12 +3106,41 @@ function initMusic() {
     s.innerHTML = '<div class="music-wave"><span></span><span></span><span></span><span></span><span></span></div><div class="music-info">' + msg + (sub ? '<div><small>' + sub + '</small></div>' : '') + '</div>';
   }
 
-  box.innerHTML = ''; box.classList.add('show'); showStatus('♫ 正在连接...', '尝试加载音乐');
+  box.innerHTML = ''; box.classList.add('show');
 
+  // ★ 优先：歌单 iframe 嵌入
+  if (playlistId && !customUrl) {
+    showStatus('♫ 歌单加载中...', '正在连接网易云歌单');
+    var iframe = document.createElement('iframe');
+    iframe.id = 'playlistIframe';
+    iframe.allow = 'autoplay; encrypted-media';
+    iframe.frameBorder = '0';
+    iframe.style.cssText = 'width:100%;height:450px;border:none;border-radius:12px;background:transparent;';
+    iframe.src = 'https://music.163.com/outchain/player?type=0&id=' + playlistId + '&auto=1&height=430';
+    var iframeDone = false;
+    iframe.onload = function() {
+      iframeDone = true;
+      showStatus('♫ 歌单播放中', '拖动切换歌曲');
+      var btn = document.getElementById('musicToggleBtn'); if (btn) btn.textContent = '🎵';
+      showGlobalToast('🎵 歌单已加载 ♫');
+    };
+    iframe.onerror = function() {
+      iframeDone = true;
+      iframe.remove();
+      showStatus('🎹 钢琴旋律', '歌单加载失败，已切换');
+      _startWebAudioMusic();
+      var btn = document.getElementById('musicToggleBtn'); if (btn) btn.textContent = '🎵';
+    };
+    setTimeout(function() { if (!iframeDone) { showStatus('🎹 钢琴旋律', '歌单超时，已切换'); _startWebAudioMusic(); var btn = document.getElementById('musicToggleBtn'); if (btn) btn.textContent = '🎵'; } }, 10000);
+    box.appendChild(iframe);
+    return;
+  }
+
+  // ★ 备选：自定义 URL 或单曲 → audio 播放
+  showStatus('♫ 正在连接...', '尝试加载音乐');
   var urls = [];
   if (customUrl && customUrl.trim()) urls.push(customUrl.trim());
   urls.push('https://music.163.com/song/media/outer/url?id=' + songId + '.mp3');
-
   var tryIdx = 0;
   function tryNext() {
     if (tryIdx >= urls.length) {
@@ -3138,7 +3181,7 @@ function initMusic() {
   const validPasswords = [LOVE_CONFIG.girlPassword, LOVE_CONFIG.boyPassword];
 
   function setupGestureListeners() {
-    if (window._musicAudio || window._webAudioCtx) return;
+    if (window._musicAudio || window._webAudioCtx || document.getElementById('playlistIframe')) return;
     ['click','touchstart','keydown'].forEach(evt => {
       document.addEventListener(evt, function handler() {
         if (overlay && !overlay.classList.contains('hidden')) return;
@@ -3150,7 +3193,7 @@ function initMusic() {
   // 已登录
   if (sessionStorage.getItem('love_authenticated') === 'true') {
     overlay.classList.add('hidden');
-    if (!window._musicAudio && !window._webAudioCtx) {
+    if (!window._musicAudio && !window._webAudioCtx && !document.getElementById('playlistIframe')) {
       setTimeout(() => {
         setupGestureListeners();
         setTimeout(() => showGlobalToast('🎵 轻触屏幕任意位置开启背景音乐'), 1000);
@@ -3163,7 +3206,7 @@ function initMusic() {
     if (validPasswords.includes(pw)) {
       sessionStorage.setItem('love_authenticated', 'true');
       overlay.classList.add('hidden');
-      if (!window._musicAudio && !window._webAudioCtx) {
+      if (!window._musicAudio && !window._webAudioCtx && !document.getElementById('playlistIframe')) {
         setTimeout(() => {
           setupGestureListeners();
           setTimeout(() => showGlobalToast('🎵 轻触屏幕任意位置开启背景音乐'), 1000);
@@ -3457,15 +3500,22 @@ let scrollObserver;
 /* ───────── Music Player ───────── */
 (function() {
   var btn = document.getElementById('musicToggleBtn');
+  var box = document.getElementById('musicBox');
   btn.addEventListener('click', function() {
-    if (!window._musicAudio && !window._webAudioCtx) { initMusic(); showGlobalToast('🎵 音乐已开启 ♫'); return; }
-    // Web Audio 模式
+    // 歌单 iframe 模式：切换显示/隐藏
+    var pIframe = document.getElementById('playlistIframe');
+    if (pIframe) {
+      var visible = box.classList.toggle('show');
+      btn.textContent = visible ? '🎵' : '🔇';
+      showGlobalToast(visible ? '🎵 歌单已显示' : '🔇 歌单已隐藏');
+      return;
+    }
+    if (!window._musicAudio && !window._webAudioCtx && !document.getElementById('playlistIframe')) { initMusic(); showGlobalToast('🎵 音乐已开启 ♫'); return; }
     if (window._webAudioCtx && !window._musicAudio) {
       if (window._webAudioRunning) { _stopWebAudioMusic(); btn.textContent = '🔇'; showGlobalToast('🔇 音乐已暂停'); }
       else { _startWebAudioMusic(); btn.textContent = '🎵'; showGlobalToast('🎹 钢琴旋律已恢复'); }
       return;
     }
-    // Audio 模式
     var a = window._musicAudio;
     if (a && a.paused) { a.play().then(function(){ btn.textContent = '🎵'; showGlobalToast('🎵 音乐已开启'); }).catch(function(){ showGlobalToast('⚠️ 播放失败，请重试'); }); }
     else if (a) { a.pause(); btn.textContent = '🔇'; showGlobalToast('🔇 音乐已暂停'); }
@@ -3508,14 +3558,10 @@ document.addEventListener('DOMContentLoaded', () => {
    🔧 音乐 fallback：已有实例则恢复，否则走完整初始化
    ═══════════════════════════════════════════════════════════════ */
 window.initMusic = function() {
-  if (window._musicAudio) {
-    if (window._musicAudio.paused) window._musicAudio.play().catch(function(){});
-    return;
-  }
-  if (window._webAudioCtx) {
-    if (!window._webAudioRunning) _startWebAudioMusic();
-    return;
-  }
+  var pIframe = document.getElementById('playlistIframe');
+  if (pIframe) { var box = document.getElementById('musicBox'); box.classList.add('show'); return; }
+  if (window._musicAudio) { if (window._musicAudio.paused) window._musicAudio.play().catch(function(){}); return; }
+  if (window._webAudioCtx) { if (!window._webAudioRunning) _startWebAudioMusic(); return; }
   initMusic();
 };
 
@@ -3536,6 +3582,7 @@ function loadCustomConfig() {
   if (cfg.boyPassword !== undefined) LOVE_CONFIG.boyPassword = cfg.boyPassword;
   if (cfg.girlPassword !== undefined) LOVE_CONFIG.girlPassword = cfg.girlPassword;
   if (cfg.customMusicUrl !== undefined) LOVE_CONFIG.customMusicUrl = cfg.customMusicUrl;
+  if (cfg.neteasePlaylistId !== undefined) LOVE_CONFIG.neteasePlaylistId = cfg.neteasePlaylistId;
   if (cfg.neteaseSongId !== undefined) LOVE_CONFIG.neteaseSongId = cfg.neteaseSongId;
   if (cfg.heroSubtitle !== undefined) {
     var els = document.querySelectorAll('.hero-subtitle');
@@ -3617,6 +3664,7 @@ function populateEditPanel() {
   safeSetValue('editHeroSubtitle', cfg.heroSubtitle || '');
   safeSetValue('editHeroDate', cfg.heroDate || '');
   safeSetValue('editMusicUrl', cfg.customMusicUrl || LOVE_CONFIG.customMusicUrl || '');
+  safeSetValue('editPlaylistId', cfg.neteasePlaylistId || LOVE_CONFIG.neteasePlaylistId || '');
   safeSetValue('editSongId', cfg.neteaseSongId || LOVE_CONFIG.neteaseSongId || '');
   safeSetValue('editBoyEmoji', (cfg.boy && cfg.boy.emoji) || LOVE_CONFIG.boy.emoji);
   safeSetValue('editBoyRole', (cfg.boy && cfg.boy.role) || LOVE_CONFIG.boy.role);
@@ -3762,6 +3810,7 @@ function saveEditPanel() {
   cfg.heroSubtitle = document.getElementById('editHeroSubtitle').value;
   cfg.heroDate = document.getElementById('editHeroDate').value;
   cfg.customMusicUrl = document.getElementById('editMusicUrl').value;
+  cfg.neteasePlaylistId = document.getElementById('editPlaylistId').value;
   cfg.neteaseSongId = document.getElementById('editSongId').value;
   // 个人档案
   cfg.boy = cfg.boy || {};
@@ -3901,9 +3950,13 @@ function readDynamicList(type) {
   if (testBtn) testBtn.addEventListener('click', function() {
     _stopWebAudioMusic();
     if (window._musicAudio) { window._musicAudio.pause(); window._musicAudio.src = ''; window._musicAudio = null; }
+    var iframe = document.getElementById('playlistIframe'); if (iframe) iframe.remove();
+    window._musicAudio = null; window._webAudioCtx = null;
+    var playlistId = document.getElementById('editPlaylistId').value.trim();
     var customUrl = document.getElementById('editMusicUrl').value.trim();
     var songId = document.getElementById('editSongId').value.trim();
-    if (!customUrl && !songId) { showGlobalToast('⚠️ 请填写音乐链接或歌曲ID'); return; }
+    if (!playlistId && !customUrl && !songId) { showGlobalToast('⚠️ 请填写歌单ID、音乐链接或歌曲ID'); return; }
+    LOVE_CONFIG.neteasePlaylistId = playlistId;
     LOVE_CONFIG.customMusicUrl = customUrl;
     LOVE_CONFIG.neteaseSongId = songId;
     initMusic();
