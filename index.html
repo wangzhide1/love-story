@@ -3205,8 +3205,12 @@ function initMusic() { toggleMusic(); }
   }
 
   function tryLogin() {
-    const pw = input.value.trim();
-    if (validPasswords.includes(pw)) {
+    var pw = input.value.trim();
+    // 合并原始密码和可能被自定义覆盖的密码
+    var allPw = validPasswords.slice();
+    if (LOVE_CONFIG.boyPassword && allPw.indexOf(LOVE_CONFIG.boyPassword) === -1) allPw.push(LOVE_CONFIG.boyPassword);
+    if (LOVE_CONFIG.girlPassword && allPw.indexOf(LOVE_CONFIG.girlPassword) === -1) allPw.push(LOVE_CONFIG.girlPassword);
+    if (allPw.indexOf(pw) !== -1) {
       sessionStorage.setItem('love_authenticated', 'true');
       overlay.classList.add('hidden');
       if (!_musicCtx) {
@@ -3216,7 +3220,7 @@ function initMusic() { toggleMusic(); }
         }, 100);
       }
     } else {
-      error.textContent = '密码不正确哦~ 请输入 ta 的出生年月日（如：20060108 或 200601105）';
+      error.textContent = '密码不正确~ 男方：20060108  女方：200601105（输入其中一个即可）';
       card.classList.add('shake');
       setTimeout(() => card.classList.remove('shake'), 500);
       input.value = '';
